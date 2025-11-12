@@ -1,0 +1,229 @@
+<div class="dashboard-root">
+  <header class="top">
+    <div class="container">
+      <h3>CRM Escuelas</h3>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="user">Hola, <strong>{{ userName }}</strong></div>
+        <button class="logout" (click)="logout()">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- filters removed from top; they will appear below intro paragraph -->
+
+  <main class="container main-layout">
+    <!-- importing overlay -->
+    <div *ngIf="importing" class="importing-overlay">
+      <div class="importing-card">
+        <div class="spinner" aria-hidden="true"></div>
+        <div style="margin-top:12px;font-weight:600">Importando archivo...</div>
+      </div>
+    </div>
+    <section class="content">
+      <h4>Bienvenido{{ userName ? (', ' + userName) : '' }}.</h4>
+      <p>Desde aquí puedes registrar escuelas y carreras usando el menú a la derecha.</p>
+
+      <div *ngIf="message" class="message">{{ message }}</div>
+
+      <div class="filters-bar">
+        <input class="search" placeholder="Buscar escuelas y carreras..." [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilters()" />
+
+        <label class="inline-filter">
+          <input type="checkbox" [checked]="showOnlyWithCarreras" (change)="showOnlyWithCarreras = $any($event.target).checked; applyFilters()" />
+          Sólo escuelas con carreras
+        </label>
+
+        <label class="inline-filter">Filtrar carreras por escuela
+          <select (change)="carFilterEscuelaId = $any($event.target).value; applyFilters()">
+            <option value="">-- Todas las escuelas --</option>
+            <option *ngFor="let e of escuelas" [value]="e.id">{{ e.nombre }}</option>
+          </select>
+        </label>
+
+        <button class="mini" (click)="searchTerm=''; carFilterEscuelaId=''; showOnlyWithCarreras=false; applyFilters()">Limpiar</button>
+      </div>
+
+      <div class="lists">
+        <div class="list">
+          <h5>Escuelas</h5>
+          <div class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('escuela')" (dragleave)="onImportDragLeave('escuela')" (drop)="onDropFiles($event,'escuela'); onImportDragLeave('escuela')" [class.dragover]="draggingEscuela">
+            <input type="file" accept=".xlsx,.xls,.csv" #escFile hidden (change)="onEscuelasFileChange($event)" />
+            <button class="mini" (click)="escFile.click()">Importar Excel (Escuelas)</button>
+            <small class="muted">o arrastra un archivo aquí</small>
+          </div>
+          <table class="table big-table">
+            <thead>
+              <tr>
+                <th style="width:40px"><input type="checkbox" [checked]="displayedEscuelas.length>0 && selectedEscuelaIds.size===displayedEscuelas.length" (change)="toggleSelectAllEscuelas($event)" /></th>
+                <th>Logo</th>
+                <th>Nombre</th>
+                <th>CCT</th>
+                <th>Teléfono</th>
+                <th>Representante</th>
+                <th>Encargado de registro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of displayedEscuelas; let i = index; trackBy: trackByEscuela" (click)="selectEscuelaByIndex(i, $event)" (contextmenu)="onRowContextMenu($event,'escuela',e.id)" [class.selected]="isSelectedEscuela(e.id)">
+                <td>
+                  <input type="checkbox" [checked]="isSelectedEscuela(e.id)" (click)="$event.stopPropagation()" (change)="selectEscuelaByIndex(i, $any($event))" />
+                </td>
+                <td class="esc-logo-cell">
+                  <img *ngIf="e.logo" [src]="e.logo" alt="logo" />
+                </td>
+                <td>{{ e.nombre }}</td>
+                <td>{{ e.cct }}</td>
+                <td>{{ e.telefono }} <span *ngIf="e.extension">ext. {{ e.extension }}</span></td>
+                <td>{{ e.representanteNombre }} <small class="muted">{{ e.representantePuesto }}</small></td>
+                <td>{{ e.encargadoRegistro }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="list">
+          <h5>Carreras</h5>
+          <div class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('carrera')" (dragleave)="onImportDragLeave('carrera')" (drop)="onDropFiles($event,'carrera'); onImportDragLeave('carrera')" [class.dragover]="draggingCarrera">
+            <input type="file" accept=".xlsx,.xls,.csv" #carFile hidden (change)="onCarrerasFileChange($event)" />
+            <button class="mini" (click)="carFile.click()">Importar Excel (Carreras)</button>
+            <small class="muted">o arrastra un archivo aquí</small>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:40px"><input type="checkbox" [checked]="displayedCarreras.length>0 && selectedCarreraIds.size===displayedCarreras.length" (change)="toggleSelectAllCarreras($event)" /></th>
+                <th>Logo</th>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Alumnos</th>
+                <th>Escuela</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of displayedCarreras; let j = index; trackBy: trackByCarrera" (click)="selectCarreraByIndex(j, $event)" (contextmenu)="onRowContextMenu($event,'carrera',c.id)" [class.selected]="isSelectedCarrera(c.id)">
+                <td>
+                  <input type="checkbox" [checked]="isSelectedCarrera(c.id)" (click)="$event.stopPropagation()" (change)="selectCarreraByIndex(j, $any($event))" />
+                </td>
+                <td class="car-logo-cell">
+                  <img *ngIf="c.logo" [src]="c.logo" alt="logo carrera" />
+                </td>
+                <td>{{ c.name }}</td>
+                <td>{{ c.code }}</td>
+                <td class="alumnos">{{ c.studentsCount ?? 0 }}</td>
+                <td>{{ getEscuelaNombre(c.escuelaId) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <aside class="right-menu">
+      <div class="menu-box">
+        <h4>Acciones</h4>
+        <button (click)="open('escuela')">Registrar escuela</button>
+        <button (click)="open('carrera')">Registrar carrera</button>
+        <hr />
+        <input type="file" accept="application/json" #jsonFile hidden (change)="onJsonFileChange($event)" />
+        <button class="mini" (click)="jsonFile.click()">Importar JSON (sin logos)</button>
+        <button class="mini" (click)="exportJsonNoLogos()">Exportar JSON (sin logos)</button>
+        <hr />
+  <button [disabled]="selectedEscuelaIds.size !== 1" (click)="startEditSelected()">Actualizar escuela seleccionado</button>
+  <button [disabled]="selectedEscuelaIds.size === 0" (click)="deleteSelectedEscuelas()">Eliminar escuelas seleccionadas</button>
+        <hr />
+  <button [disabled]="selectedCarreraIds.size !== 1" (click)="startEditSelectedCarrera()">Actualizar carrera seleccionada</button>
+  <button [disabled]="selectedCarreraIds.size === 0" (click)="deleteSelectedCarreras()">Eliminar carreras seleccionadas</button>
+      </div>
+      <!-- forms are now presented as centered modals; inline forms removed -->
+    </aside>
+  </main>
+  <!-- Escuela modal (centered) -->
+  <div class="modal-overlay" *ngIf="active === 'escuela'" (click)="closeMenus()">
+    <div class="modal-card form-modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>{{ editMode ? 'Actualizar escuela' : 'Nueva escuela' }}</h3>
+        <button class="mini" (click)="closeMenus()">Cerrar</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-box">
+          <form [formGroup]="escuelaForm" (ngSubmit)="saveEscuela()">
+            <label>Nombre de la institución
+              <input formControlName="nombre" placeholder="Nombre de la institución" /></label>
+            <label>CCT
+              <input formControlName="cct" placeholder="CCT" /></label>
+            <label>Teléfono
+              <input formControlName="telefono" placeholder="Teléfono" /></label>
+            <label>Extensión (opcional)
+              <input formControlName="extension" placeholder="Extensión (opcional)" /></label>
+            <label>Correo
+              <input formControlName="correo" placeholder="Correo" /></label>
+            <label>Nombre del representante
+              <input formControlName="representanteNombre" placeholder="Nombre del representante" /></label>
+            <label>Puesto del representante
+              <input formControlName="representantePuesto" placeholder="Puesto del representante" /></label>
+            <label>Dirección de la institución
+              <input formControlName="direccion" placeholder="Dirección de la institución" /></label>
+            <label class="file-label">Logo (archivo)
+              <input type="file" accept="image/*" (change)="onLogoFileChange($event)" />
+            </label>
+            <div *ngIf="logoPreview" class="logo-preview">
+              <img [src]="logoPreview" alt="Logo preview" />
+            </div>
+            <label>Página de la institución
+              <input formControlName="pagina" placeholder="Página de la institución" /></label>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button type="button" class="mini" (click)="closeMenus()">Cancelar</button>
+              <button type="submit" [disabled]="escuelaForm.invalid">{{ editMode ? 'Actualizar' : 'Guardar' }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrera modal (centered) -->
+  <div class="modal-overlay" *ngIf="active === 'carrera'" (click)="closeMenus()">
+    <div class="modal-card form-modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>Nueva carrera</h3>
+        <button class="mini" (click)="closeMenus()">Cerrar</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-box">
+          <form [formGroup]="carreraForm" (ngSubmit)="saveCarrera()">
+            <label>Nombre
+              <input formControlName="name" placeholder="Nombre" /></label>
+            <label>Código
+              <input formControlName="code" placeholder="Código" /></label>
+            <label>Cantidad de alumnos
+              <input type="number" formControlName="studentsCount" placeholder="0" min="0" /></label>
+            <label>Logo de la carrera
+              <input type="file" accept="image/*" (change)="onCarreraLogoChange($event)" /></label>
+            <div *ngIf="carreraLogoPreview" class="logo-preview">
+              <img [src]="carreraLogoPreview" alt="Logo carrera preview" />
+            </div>
+            <label>Escuela
+              <select formControlName="escuelaId">
+                <option value="">-- Seleccionar escuela --</option>
+                <option *ngFor="let e of escuelas" [value]="e.id">{{ e.nombre }}</option>
+              </select>
+            </label>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button type="button" class="mini" (click)="closeMenus()">Cancelar</button>
+              <button type="submit" [disabled]="carreraForm.invalid">Guardar carrera</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- confirm modal (service-controlled) -->
+  <app-confirm-modal></app-confirm-modal>
+  <!-- Context menu -->
+  <div *ngIf="contextMenuVisible" class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY" (click)="$event.stopPropagation()">
+    <button (click)="contextAdd(contextMenuTarget?.type || 'escuela')">Agregar {{ contextMenuTarget?.type }}</button>
+    <button [disabled]="!contextMenuTarget?.id" (click)="contextEdit()">Editar {{ contextMenuTarget?.type }}</button>
+    <button [disabled]="!contextMenuTarget?.id" (click)="contextDelete()">Eliminar {{ contextMenuTarget?.type }}</button>
+  </div>
+</div>

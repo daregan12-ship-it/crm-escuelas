@@ -1,0 +1,15 @@
+<div class="modal-backdrop" *ngIf="show" role="presentation">
+  <div class="modal-card" #modalCard role="dialog" aria-modal="true" [attr.aria-labelledby]="'confirmTitle'" [attr.aria-describedby]="'confirmMsg'">
+    <header class="modal-header">
+      <h3 id="confirmTitle">{{ title }}</h3>
+    </header>
+    <div class="modal-body" id="confirmMsg">
+      <p>{{ message }}</p>
+    </div>
+    <footer class="modal-footer">
+      <button class="btn btn-cancel" (click)="onCancel()">Cancelar</button>
+      <button class="btn btn-confirm" (click)="onConfirm()">Confirmar</button>
+    </footer>
+  </div>
+</div>
+

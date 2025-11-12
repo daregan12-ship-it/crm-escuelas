@@ -1,0 +1,27 @@
+.auth-page{
+  min-height:100vh;
+  display:flex;
+  /* place the card a bit higher than exact center so it sits under the header */
+  align-items:flex-start;
+  justify-content:center;
+  padding-top:80px; /* tweak this value if you want it closer/further from the header */
+  background: linear-gradient(180deg,#f6f8fb 0%, #eef2f6 100%);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  color: #222;
+}
+.card{
+  width:360px;
+  background: #ffffff;
+  border-radius:12px;
+  padding:28px;
+  box-shadow: 0 6px 20px rgba(15,23,42,0.08);
+  border: 1px solid rgba(15,23,42,0.04);
+  color:#222;
+}
+.card h2{margin:0 0 18px 0; font-size:20px}
+label{display:block; margin-bottom:12px}
+input{width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; background:#fff; color:#222}
+button{width:100%; padding:10px; border-radius:8px; border:0; margin-top:8px; background:#2b6cb0; color:#fff; font-weight:600}
+.muted{font-size:13px; opacity:0.85; margin-top:12px}
+.error{color:#c53030; margin-top:6px; font-size:13px}
+.success{color:#2f855a; margin-top:6px; font-size:13px}

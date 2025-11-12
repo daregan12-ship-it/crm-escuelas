@@ -1,0 +1,157 @@
+{
+  "savedAt": "2025-11-11T19:07:54.291Z",
+  "payload": {
+    "escuelas": [
+      {
+        "id": "esc_1762647440113",
+        "nombre": "Instituto Tecnológico de La Piedad",
+        "cct": "16DIT0015E",
+        "telefono": "3525262363",
+        "extension": "",
+        "correo": "maria.ac@piedad.tecnm.mx",
+        "representanteNombre": "Javier Jimenez Cortes",
+        "representantePuesto": "Director General",
+        "direccion": "Avenida Tecnologico Num. Ext. 2000, La Piedad de Cabadas La Piedad CP. 59379",
+        "pagina": "www.itlapiedad.edu.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1762848077500_4_ddr1um9yc",
+        "nombre": "Instituto Tecnologico de Aguascalientes",
+        "cct": "01DIT0015C",
+        "telefono": " +52 (449) 910 50 02",
+        "extension": "",
+        "correo": "ita@aguascalientes.com",
+        "representanteNombre": "Dr. José Luis Gil Vázquez",
+        "representantePuesto": "Director general",
+        "direccion": "Av. Adolfo López Mateos #1801 Ote. Fracc. Bona Gens, C.P. 20255 Aguascalientes, Ags., México.",
+        "pagina": "comunicacion@aguascalientes.tecnm.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1762848077501_5_42apt1t2n",
+        "nombre": "Tecnológico Nacional de México Campus Monterrey",
+        "cct": "19DIT0001A",
+        "telefono": 8183749200,
+        "extension": 102,
+        "correo": "jose.martinez@monterrey.tecnm.mx",
+        "representanteNombre": "José Martínez López",
+        "representantePuesto": "Director General",
+        "direccion": "Av. Eugenio Garza Sada 2501, Monterrey, N.L.",
+        "pagina": "www.mty.tecnm.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1762848077501_6_vx5q3191n",
+        "nombre": "Instituto Tecnológico de Pachuca",
+        "cct": "13DIT0020T",
+        "telefono": "771 711 3073 / 771 711 3596 / 771 711 3140 / 771 711 5119",
+        "extension": 1002,
+        "correo": "dir_pachuca@tecnm.mx",
+        "representanteNombre": "Mtro. Miguel Ángel Lee Rodríguez",
+        "representantePuesto": "Director",
+        "direccion": "Carretera México-Pachuca Km. 87.5, Col. Venta Prieta, Pachuca de Soto, Hidalgo",
+        "pagina": "https://www.itpachuca.edu.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1762848077501_7_glk0dccvx",
+        "nombre": "Instituto Tecnológico de Estudios Superiores de Zamora",
+        "cct": "30EIT0007O",
+        "telefono": "351-520-0177",
+        "extension": 1101,
+        "correo": "direcciongeneral@teczamora.mx",
+        "representanteNombre": "Mtro. Karlo Martín Samaguey Zamora",
+        "representantePuesto": "Director General",
+        "direccion": "Carretera Zamora-La Piedad Km 7, El Sáuz de Abajo, Zamora, Michoacán C.P. 59720",
+        "pagina": "https://www.teczamora.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1762848077501_8_ymzrucrc6",
+        "nombre": "Instituto Tecnológico Superior de Xalapa",
+        "cct": "30EIT0007O",
+        "telefono": "(228) 165-05-25",
+        "extension": 101,
+        "correo": "direcciongeneral@itsx.edu.mx",
+        "representanteNombre": "Omar Romero Sandoval",
+        "representantePuesto": "Director General",
+        "direccion": "Sección 5ta Reserva Territorial s/n, Col. Santa Bárbara, C.P. 91096, Xalapa, Veracruz",
+        "pagina": "https://www.itsx.edu.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      }
+    ],
+    "carreras": [
+      {
+        "id": "car_1762661366338",
+        "name": "Tecnologias de la Información y Comunicación",
+        "code": "528AQWE41",
+        "escuelaId": "esc_1762647440113",
+        "studentsCount": 55
+      },
+      {
+        "id": "car_1762848273039_1_jj1f6mdbc",
+        "name": "Ingeniería en Administración",
+        "code": "IA",
+        "escuelaId": "esc_1762848077500_4_ddr1um9yc",
+        "studentsCount": 50
+      },
+      {
+        "id": "car_1762848273039_2_ki7pgx2wk",
+        "name": "Ingeniería en Gestión Empresarial",
+        "code": "IGE",
+        "escuelaId": "esc_1762647440113",
+        "studentsCount": 125
+      },
+      {
+        "id": "car_1762848273039_3_x2pn32xww",
+        "name": "Ingeniería en Sistemas Computacionales",
+        "code": "ISC",
+        "escuelaId": "esc_1762848077501_5_42apt1t2n",
+        "studentsCount": 200
+      },
+      {
+        "id": "car_1762848273040_4_qcbocdqnu",
+        "name": "Ingeniería en Tecnologías de la Información y Comunicaciones",
+        "code": "ITIC",
+        "escuelaId": "esc_1762848077501_7_glk0dccvx",
+        "studentsCount": 100
+      },
+      {
+        "id": "car_1762848273040_5_k38zd9e8g",
+        "name": "Ingeniería Bioquímica",
+        "code": "IBQ",
+        "escuelaId": "esc_1762647440113",
+        "studentsCount": 123
+      },
+      {
+        "id": "car_1762848273040_6_8o11wpagu",
+        "name": "Ingeniería Industrial",
+        "code": "II",
+        "escuelaId": "esc_1762848077501_8_ymzrucrc6",
+        "studentsCount": 330
+      },
+      {
+        "id": "car_1762848273040_7_69u51cpvr",
+        "name": "Ingeniería Mecatrónica",
+        "code": "IM",
+        "escuelaId": "esc_1762848077501_5_42apt1t2n",
+        "studentsCount": 152
+      },
+      {
+        "id": "car_1762848273040_8_lc4dafprx",
+        "name": "Ingeniería en Inteligencia Artificial",
+        "code": "IIA",
+        "escuelaId": "esc_1762647440113",
+        "studentsCount": 5
+      },
+      {
+        "id": "car_1762848273040_9_ni5rof4nk",
+        "name": "Contador Público",
+        "code": "CP",
+        "escuelaId": "esc_1762848077500_4_ddr1um9yc",
+        "studentsCount": 0
+      }
+    ]
+  }
+}

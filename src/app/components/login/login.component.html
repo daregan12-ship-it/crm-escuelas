@@ -1,0 +1,23 @@
+<div class="auth-page">
+  <div class="card">
+    <h2>Iniciar sesión</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label>
+        <input formControlName="email" type="email" placeholder="Correo electrónico" />
+      </label>
+
+      <label>
+        <input formControlName="password" type="password" placeholder="Contraseña" />
+      </label>
+
+      <div *ngIf="error" class="error">{{ error }}</div>
+
+      <div id="recaptcha-container" style="margin:12px 0"></div>
+
+      <button type="submit" [disabled]="form.invalid || !recaptchaResponse">Entrar</button>
+    </form>
+
+    <p class="muted">¿No tienes cuenta? <a routerLink="/register">Regístrate</a></p>
+  </div>
+</div>

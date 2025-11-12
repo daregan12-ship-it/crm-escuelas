@@ -1,0 +1,30 @@
+<div class="auth-page">
+  <div class="card">
+    <h2>Crear cuenta</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label>
+        <input formControlName="name" type="text" placeholder="Nombre completo" />
+      </label>
+
+      <label>
+        <input formControlName="email" type="email" placeholder="Correo electrónico" />
+      </label>
+
+      <label>
+        <input formControlName="password" type="password" placeholder="Contraseña" />
+      </label>
+
+      <label>
+        <input formControlName="confirm" type="password" placeholder="Repetir contraseña" />
+      </label>
+
+      <div *ngIf="error" class="error">{{ error }}</div>
+      <div *ngIf="success" class="success">{{ success }}</div>
+
+      <button type="submit" [disabled]="form.invalid">Crear cuenta</button>
+    </form>
+
+    <p class="muted">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+  </div>
+</div>
