@@ -1,0 +1,136 @@
+CRM Escuelas — Documentación
+
+Índice
+1. Introducción
+2. Características principales
+3. Tecnologías
+4. Requisitos
+5. Instalación (desarrollo)
+6. Uso
+7. API (resumen)
+8. Arquitectura
+9. Testing
+10. Despliegue
+11. Contribuir
+12. Seguridad
+13. Roadmap
+14. Changelog
+15. Contacto
+
+1. Introducción
+CRM Escuelas es una aplicación para gestionar escuelas, sedes, alumnos, familias, cursos, matrículas y la comunicación entre el centro y las familias. Está pensada para equipos administrativos y docentes que necesiten centralizar la información académica y administrativa.
+
+2. Características principales
+- Gestión de escuelas y sedes
+- Gestión de alumnos y sus familias
+- Matrículas y pagos
+- Gestión de cursos, asignaturas y grupos
+- Roles y permisos (admin, profesor, administrativo)
+- Comunicación (email, notificaciones)
+- Reportes y exportes
+
+3. Tecnologías
+- Backend: (indicar framework e.g., Node.js/Express, Django, Laravel)
+- Frontend: (indicar framework e.g., React, Vue)
+- Base de datos: PostgreSQL (reemplazar si corresponde)
+- Contenedores: Docker + docker-compose
+- CI/CD: GitHub Actions (opcional)
+
+4. Requisitos
+- Git >= X
+- Node.js >= X / Python >= X / PHP >= X (ajustar según stack)
+- Docker (recomendado)
+- PostgreSQL (si no se usa Docker)
+
+5. Instalación (desarrollo)
+Instalación usando Docker (recomendado)
+1. Clona el repositorio:
+   git clone https://github.com/daregan12-ship-it/crm-escuelas.git
+2. Entra en el directorio:
+   cd crm-escuelas
+3. Copia variables de entorno:
+   cp .env.example .env
+4. Levanta los servicios:
+   docker-compose up --build
+5. Ejecuta migraciones y seeds:
+   docker-compose exec app <comando_migraciones>
+6. Accede a la aplicación en http://localhost:3000 (o el puerto configurado)
+
+Instalación manual (sin Docker)
+1. Instala dependencias:
+   (comando según stack, e.g., npm install, pip install -r requirements.txt, composer install)
+2. Configura .env con la base de datos y credenciales
+3. Ejecuta migraciones:
+   (comando)
+4. Levanta la app en modo desarrollo:
+   (comando)
+
+NOTA: Reemplazar los comandos concretos según el stack del proyecto.
+
+6. Uso
+Comandos comunes:
+- Inicio en modo desarrollo: (comando)
+- Build para producción: (comando)
+- Linter: (comando)
+- Crear usuario admin (si aplica): (comando)
+
+Credenciales de ejemplo
+- admin@example.com / password123 (si aplica). Sustituir por usuarios reales o seeds.
+
+7. API (resumen)
+Base URL: http://localhost:3000/api/v1
+Autenticación: JWT/OAuth2 (según implementación)
+Ejemplos de endpoints:
+- POST /api/v1/auth/login  -> obtener token
+- GET  /api/v1/alumnos     -> listar alumnos
+- POST /api/v1/escuelas    -> crear escuela (roles: admin)
+Paginación y filtros: page, per_page, sort, filter
+Códigos de estado principales: 200, 201, 400, 401, 403, 404, 500
+
+(Completar con la documentación detallada de la API: parámetros, ejemplos de request/response, errores.)
+
+8. Arquitectura
+Tipo: Monolito / API + SPA (ajustar)
+Componentes:
+- API: rutas y controladores principales
+- Frontend: SPA (React/Vue) o plantillas server-side
+- DB: esquema entidades principales: Escuela, Sede, Alumno, Familia, Curso, Matrícula, Usuario, Rol
+Diagramas: añadir diagrama de componentes y de despliegue en /docs/assets (marcador)
+
+9. Testing
+Tipos de tests: unitarios, integración, E2E (Cypress/Playwright)
+Ejecutar tests:
+- npm test / pytest / phpunit (ajustar)
+Coverage: configurar en CI
+
+10. Despliegue
+Ambientes: staging, production
+Pipeline: build -> tests -> image -> deploy (GitHub Actions / GitLab CI)
+Contenedores: Docker images, tags y despliegue en Kubernetes / hosting (ajustar)
+Rollback: describir procedimiento de rollback
+
+11. Contribuir
+Workflow recomendado:
+1. Fork -> rama feature/mi-cambio
+2. Añadir tests que cubran los cambios
+3. Formatear código (ESLint/Prettier/PHPCS)
+4. Abrir PR describiendo los cambios y enlazando issues
+
+Contribuciones aceptadas mediante PRs. Ver docs/CONTRIBUTING.md para reglas y plantillas.
+
+12. Seguridad
+- No subir .env ni secretos al repo
+- Uso de Dependabot o herramientas de escaneo
+- Reportar vulnerabilidades a: security@example.com (sustituir)
+
+13. Roadmap
+- v1.0: MVP con gestión de alumnos, cursos y matrículas
+- v1.1: Comunicación integrada (email, notificaciones)
+- v2.0: Integraciones con pasarelas de pago y escalabilidad
+
+14. Changelog
+Seguir Keep a Changelog. Añadir entradas de versiones en docs/CHANGELOG.md
+
+15. Contacto
+Mantenedor principal: @daregan12-ship-it
+Correo: contacto@example.com (sustituir)
