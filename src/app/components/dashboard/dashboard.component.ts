@@ -1,9 +1,10 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule, NgIf, NgForOf } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { DataService, Escuela, Carrera } from '../../services/data.service';
+import Chart from 'chart.js/auto';
 import * as XLSX from 'xlsx';
 import { Router } from '@angular/router';
 import { ConfirmModalComponent } from '../shared/confirm-modal/confirm-modal.component';
@@ -16,7 +17,7 @@ import { ConfirmModalService } from '../../services/confirm-modal.service';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
   userName: string | null = null;
 
   // right menu state: 'escuela' | 'carrera' | null
@@ -32,6 +33,12 @@ export class DashboardComponent implements OnInit {
   displayedEscuelas: Escuela[] = [];
   displayedCarreras: Carrera[] = [];
   carreraLogoPreview: string | null = null;
+
+  // Chart.js reference
+  @ViewChild('populationChart') populationChart!: ElementRef<HTMLCanvasElement>;
+  private populationChartObj: any = null;
+  // chart modal visibility
+  showPopulationModal = false;
 
   escuelas: Escuela[] = [];
   carreras: Carrera[] = [];
@@ -82,11 +89,27 @@ export class DashboardComponent implements OnInit {
       code: [''],
       escuelaId: [''],
       studentsCount: [0],
+      expectedPopulation: [0, [Validators.min(0)]],
       logo: ['']
     });
 
     // initial filtered lists
     this.applyFilters();
+  }
+
+  ngAfterViewInit(): void {
+    // ensure chart is rendered once the canvas is available
+    this.renderPopulationChart();
+  }
+
+  openPopulationModal() {
+    this.showPopulationModal = true;
+    // wait for modal to render
+    setTimeout(() => this.renderPopulationChart(), 0);
+  }
+
+  closePopulationModal() {
+    this.showPopulationModal = false;
   }
 
   // file import handlers
@@ -201,6 +224,8 @@ export class DashboardComponent implements OnInit {
         code: map['code'] || map['codigo'] || map['id'] || '',
         escuelaId: escuelaId || '',
         studentsCount: Number(map['studentscount'] || map['alumnos'] || 0) || 0,
+        // try multiple header variants for expected population
+        expectedPopulation: Number(map['poblacion_esperada'] || map['poblacionesperada'] || map['expected_population'] || map['expectedpopulation'] || map['poblacion'] || map['expected'] || 0) || 0,
         logo: ''
       };
       if (payload.name) {
@@ -360,6 +385,7 @@ export class DashboardComponent implements OnInit {
     this.message = count === 1 ? 'Escuela eliminada' : `${count} escuelas eliminadas`;
     this.selectedEscuelaIds.clear();
     this.selectedEscuelaId = null;
+    if (this.showPopulationModal) setTimeout(() => this.renderPopulationChart(), 0);
   }
 
   // delete multiple selected carreras
@@ -376,6 +402,7 @@ export class DashboardComponent implements OnInit {
     this.message = count === 1 ? 'Carrera eliminada' : `${count} carreras eliminadas`;
     this.selectedCarreraIds.clear();
     this.selectedCarreraId = null;
+    if (this.showPopulationModal) setTimeout(() => this.renderPopulationChart(), 0);
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -529,6 +556,7 @@ export class DashboardComponent implements OnInit {
       code: c.code || '',
       escuelaId: c.escuelaId || '',
       studentsCount: c.studentsCount ?? 0,
+      expectedPopulation: c.expectedPopulation ?? 0,
       logo: c.logo || ''
     });
     this.carreraLogoPreview = c.logo || null;
@@ -598,6 +626,7 @@ export class DashboardComponent implements OnInit {
     const payload = { ...(this.carreraForm.value as any) };
     // ensure numeric
     if (payload.studentsCount !== undefined) payload.studentsCount = Number(payload.studentsCount) || 0;
+    if (payload.expectedPopulation !== undefined) payload.expectedPopulation = Number(payload.expectedPopulation) || 0;
     if (this.editModeCarrera && this.selectedCarreraId) {
       const ok = this.data.updateCarrera(this.selectedCarreraId, payload);
       this.carreras = this.data.getCarreras();
@@ -614,6 +643,8 @@ export class DashboardComponent implements OnInit {
     this.carreraForm.reset();
     this.carreraLogoPreview = null;
     this.applyFilters();
+    // if the population modal is open, re-render the chart after the DOM updates
+    if (this.showPopulationModal) setTimeout(() => this.renderPopulationChart(), 0);
   }
 
   // JSON import/export (without logos)
@@ -698,6 +729,8 @@ export class DashboardComponent implements OnInit {
       const hay = (c.name || '') + ' ' + (c.code || '');
       return hay.toLowerCase().includes(s);
     });
+    // update chart when displayedCarreras changes
+    this.renderPopulationChart();
   }
 
   onLogoFileChange(event: Event) {
@@ -744,4 +777,45 @@ export class DashboardComponent implements OnInit {
       reader.readAsDataURL(file);
     });
   }
+
+  // Chart rendering for expected population per carrera
+  private renderPopulationChart() {
+    try {
+      const labels = this.displayedCarreras.map(c => c.name || '(sin nombre)');
+      const data = this.displayedCarreras.map(c => Number(c.expectedPopulation || 0));
+
+      const ctx = this.populationChart?.nativeElement as HTMLCanvasElement | undefined;
+      if (!ctx) return;
+
+      // if there's an existing chart instance, destroy it and recreate to avoid stale/dimension issues
+      if (this.populationChartObj) {
+        try { this.populationChartObj.destroy(); } catch (e) { /* ignore */ }
+        this.populationChartObj = null;
+      }
+
+      this.populationChartObj = new (Chart as any)(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Población esperada',
+              data,
+              backgroundColor: 'rgba(54,162,235,0.6)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    } catch (err) {
+      console.warn('Error rendering chart', err);
+    }
+  }
+
 }

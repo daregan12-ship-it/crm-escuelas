@@ -21,6 +21,8 @@ export interface Carrera {
   code?: string;
   escuelaId?: string;
   studentsCount?: number;
+  // expected population for planning/analysis (number of expected students)
+  expectedPopulation?: number;
   logo?: string; // base64 or url
 }
 

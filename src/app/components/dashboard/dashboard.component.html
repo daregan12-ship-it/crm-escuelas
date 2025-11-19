@@ -6,6 +6,7 @@
         <div class="user">Hola, <strong>{{ userName }}</strong></div>
         <button class="logout" (click)="logout()">Cerrar sesión</button>
       </div>
+      
     </div>
   </header>
 
@@ -82,7 +83,7 @@
         </div>
 
         <div class="list">
-          <h5>Carreras</h5>
+          <h5 style="display:flex;align-items:center;gap:12px">Carreras <button class="mini" style="margin-left:8px" (click)="openPopulationModal()">Ver gráfico</button></h5>
           <div class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('carrera')" (dragleave)="onImportDragLeave('carrera')" (drop)="onDropFiles($event,'carrera'); onImportDragLeave('carrera')" [class.dragover]="draggingCarrera">
             <input type="file" accept=".xlsx,.xls,.csv" #carFile hidden (change)="onCarrerasFileChange($event)" />
             <button class="mini" (click)="carFile.click()">Importar Excel (Carreras)</button>
@@ -96,6 +97,7 @@
                 <th>Nombre</th>
                 <th>Código</th>
                 <th>Alumnos</th>
+                <th>Población esperada</th>
                 <th>Escuela</th>
               </tr>
             </thead>
@@ -110,6 +112,7 @@
                 <td>{{ c.name }}</td>
                 <td>{{ c.code }}</td>
                 <td class="alumnos">{{ c.studentsCount ?? 0 }}</td>
+                <td class="alumnos">{{ c.expectedPopulation ?? 0 }}</td>
                 <td>{{ getEscuelaNombre(c.escuelaId) }}</td>
               </tr>
             </tbody>
@@ -208,6 +211,9 @@
                 <option *ngFor="let e of escuelas" [value]="e.id">{{ e.nombre }}</option>
               </select>
             </label>
+            <label>Población esperada
+              <input type="number" formControlName="expectedPopulation" placeholder="0" min="0" />
+            </label>
             <div style="display:flex;gap:10px;justify-content:flex-end">
               <button type="button" class="mini" (click)="closeMenus()">Cancelar</button>
               <button type="submit" [disabled]="carreraForm.invalid">Guardar carrera</button>
@@ -220,6 +226,20 @@
 
   <!-- confirm modal (service-controlled) -->
   <app-confirm-modal></app-confirm-modal>
+  <!-- Population chart modal -->
+  <div class="modal-overlay" *ngIf="showPopulationModal" (click)="closePopulationModal()">
+    <div class="modal-card" style="width:80%;max-width:900px;height:480px;" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>Gráfico: Población esperada por carrera</h3>
+        <button class="mini" (click)="closePopulationModal()">Cerrar</button>
+      </header>
+      <div class="modal-body" style="padding:12px; height:380px;">
+        <div style="height:100%">
+          <canvas #populationChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Context menu -->
   <div *ngIf="contextMenuVisible" class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY" (click)="$event.stopPropagation()">
     <button (click)="contextAdd(contextMenuTarget?.type || 'escuela')">Agregar {{ contextMenuTarget?.type }}</button>

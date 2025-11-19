@@ -1,5 +1,5 @@
 {
-  "savedAt": "2025-11-11T19:07:54.291Z",
+  "savedAt": "2025-11-19T05:47:38.484Z",
   "payload": {
     "escuelas": [
       {
@@ -87,28 +87,32 @@
         "name": "Tecnologias de la Información y Comunicación",
         "code": "528AQWE41",
         "escuelaId": "esc_1762647440113",
-        "studentsCount": 55
+        "studentsCount": 55,
+        "expectedPopulation": 100
       },
       {
         "id": "car_1762848273039_1_jj1f6mdbc",
         "name": "Ingeniería en Administración",
         "code": "IA",
         "escuelaId": "esc_1762848077500_4_ddr1um9yc",
-        "studentsCount": 50
+        "studentsCount": 50,
+        "expectedPopulation": 150
       },
       {
         "id": "car_1762848273039_2_ki7pgx2wk",
         "name": "Ingeniería en Gestión Empresarial",
         "code": "IGE",
         "escuelaId": "esc_1762647440113",
-        "studentsCount": 125
+        "studentsCount": 125,
+        "expectedPopulation": 20
       },
       {
         "id": "car_1762848273039_3_x2pn32xww",
         "name": "Ingeniería en Sistemas Computacionales",
         "code": "ISC",
         "escuelaId": "esc_1762848077501_5_42apt1t2n",
-        "studentsCount": 200
+        "studentsCount": 200,
+        "expectedPopulation": 10
       },
       {
         "id": "car_1762848273040_4_qcbocdqnu",
