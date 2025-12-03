@@ -19,6 +19,12 @@ import { ConfirmModalService } from '../../services/confirm-modal.service';
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   userName: string | null = null;
+  isAdmin = false;
+  currentUserEscuelaId: string | null = null;
+  // when admin clicks a school, show only its carreras in card view
+  viewingEscuelaId: string | null = null;
+  // side menu open state
+  menuOpen = true;
 
   // right menu state: 'escuela' | 'carrera' | null
   active: 'escuela' | 'carrera' | null = null;
@@ -42,8 +48,20 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   escuelas: Escuela[] = [];
   carreras: Carrera[] = [];
+  // carreras to display specifically on the chart (when viewing a single escuela)
+  chartCarreras: Carrera[] = [];
 
   message = '';
+  // profile modal + form
+  showProfileModal = false;
+  profileForm!: FormGroup;
+  profilePhotoPreview: string | null = null;
+  showProfileDropdown = false;
+
+  getCurrentUserEmail(): string | null {
+    const u = this.auth.currentUser();
+    return u ? u.email : null;
+  }
   logoPreview: string | null = null;
   selectedEscuelaId: string | null = null;
   selectedCarreraId: string | null = null;
@@ -52,6 +70,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   selectedCarreraIds: Set<string> = new Set();
   editMode = false;
   editModeCarrera = false;
+  // when non-admin creates a carrera, restrict escuela to user's escuela
+  restrictCarreraToUserEscuela = false;
   // context menu state
   contextMenuVisible = false;
   contextMenuX = 0;
@@ -68,6 +88,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.userName = this.auth.currentUserName();
+    const cu = this.auth.currentUser();
+    this.isAdmin = !!(cu && cu.role === 'admin');
+    this.currentUserEscuelaId = cu && cu.escuelaId ? cu.escuelaId : null;
     this.escuelas = this.data.getEscuelas();
     this.carreras = this.data.getCarreras();
 
@@ -94,7 +117,187 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     });
 
     // initial filtered lists
+    // If user is not admin, force filter to their escuela
+    if (!this.isAdmin && this.currentUserEscuelaId) {
+      this.carFilterEscuelaId = this.currentUserEscuelaId;
+    }
     this.applyFilters();
+
+    // build profile form from current user
+    this.profileForm = this.fb.group({
+      name: [cu?.name || ''],
+      email: [cu?.email || '', [Validators.required, Validators.email]],
+      password: [''],
+      confirmPassword: ['']
+    });
+    if (cu && (cu as any).avatar) this.profilePhotoPreview = (cu as any).avatar;
+  }
+
+  openProfileModal() {
+    const cu = this.auth.currentUser();
+    this.profileForm.patchValue({ name: cu?.name || '', email: cu?.email || '', password: '', confirmPassword: '' });
+    this.profilePhotoPreview = (cu && (cu as any).avatar) ? (cu as any).avatar : null;
+    this.showProfileModal = true;
+  }
+
+  closeProfileModal() {
+    this.showProfileModal = false;
+    this.profileForm.reset();
+  }
+
+  onProfilePhotoChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      const res = reader.result as string | ArrayBuffer | null;
+      if (!res) return;
+      // use base64 data url
+      const b64 = typeof res === 'string' ? res : null;
+      if (b64) this.profilePhotoPreview = b64;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  saveProfile() {
+    if (this.profileForm.invalid) {
+      this.message = 'Revisa los campos del formulario.';
+      return;
+    }
+    const cu = this.auth.currentUser();
+    if (!cu) { this.message = 'Usuario no autenticado.'; return; }
+    const oldEmail = cu.email;
+    const v = this.profileForm.value;
+    if (v.password && v.password !== v.confirmPassword) { this.message = 'Las contraseñas no coinciden.'; return; }
+
+    // prevent duplicate email
+    const newEmail = v.email;
+    if (newEmail !== oldEmail) {
+      const exists = this.data.getUsers().some(u => u.email === newEmail);
+      if (exists) { this.message = 'El correo ya está en uso.'; return; }
+    }
+
+    const patch: any = { name: v.name, email: newEmail };
+    if (v.password) patch.password = v.password;
+    if (this.profilePhotoPreview) patch.avatar = this.profilePhotoPreview;
+
+    const ok = this.data.updateUser(oldEmail, patch);
+    if (!ok) { this.message = 'Error al guardar perfil.'; return; }
+
+    // update current user in localStorage so auth.currentUser() reflects changes
+    try {
+      const updated = { ...(cu as any), ...patch };
+      localStorage.setItem('crm_current_v1', JSON.stringify(updated));
+    } catch (e) { /* ignore */ }
+
+    this.message = 'Perfil actualizado.';
+    this.showProfileModal = false;
+    // refresh simple values in component
+    this.userName = this.auth.currentUserName();
+    this.refreshData();
+  }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  showCarrerasOfEscuela(id: string) {
+    this.viewingEscuelaId = id;
+    this.carFilterEscuelaId = id;
+    // mark as selected
+    this.selectedEscuelaId = id;
+    this.selectedEscuelaIds = new Set([id]);
+    // clear carrera selection
+    this.selectedCarreraId = null;
+    this.selectedCarreraIds.clear();
+    this.applyFilters();
+    // small scroll to carreras section if present
+    setTimeout(() => {
+      const el = document.querySelector('.list.carreras');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  }
+
+  clearViewingEscuela() {
+    this.viewingEscuelaId = null;
+    this.carFilterEscuelaId = '';
+    this.applyFilters();
+  }
+
+  editEscuelaById(id: string) {
+    this.selectedEscuelaId = id;
+    this.startEditSelected();
+  }
+
+  async deleteEscuelaById(id: string) {
+    const s = this.escuelas.find(x => x.id === id);
+    const name = s ? s.nombre : id;
+    const confirmed = await this.confirmSvc.open(`¿Seguro que deseas eliminar la escuela "${name}"? Esta acción no se puede deshacer.`, 'Eliminar escuela');
+    if (!confirmed) return;
+    this.data.deleteEscuela(id);
+    this.refreshData();
+    this.message = 'Escuela eliminada';
+  }
+
+  editCarreraById(id: string) {
+    this.selectedCarreraId = id;
+    this.startEditSelectedCarrera();
+  }
+
+  async deleteCarreraById(id: string) {
+    const c = this.carreras.find(x => x.id === id);
+    const name = c ? c.name : id;
+    const confirmed = await this.confirmSvc.open(`¿Seguro que deseas eliminar la carrera "${name}"? Esta acción no se puede deshacer.`, 'Eliminar carrera');
+    if (!confirmed) return;
+    this.data.deleteCarrera(id);
+    this.refreshData();
+    this.message = 'Carrera eliminada';
+  }
+
+  exportCsvAll() {
+    const payload = this.data.exportAllWithoutLogos();
+    // helper to convert array of objects to CSV
+    const toCsv = (arr: any[]) => {
+      if (!Array.isArray(arr) || arr.length === 0) return '';
+      // collect headers as union of keys
+      const keys = Array.from(arr.reduce((s, item) => { Object.keys(item || {}).forEach(k => s.add(k)); return s; }, new Set<string>())) as string[];
+      const esc = (v: any) => v == null ? '' : String(v).replace(/"/g, '""');
+      const rows = [keys.join(',')];
+      for (const r of arr) {
+        const line = keys.map(k => `"${esc((r as any)[k])}"`).join(',');
+        rows.push(line);
+      }
+      return rows.join('\n');
+    };
+
+    // prepare three CSVs: escuelas, carreras, users
+    try {
+      const escCsv = toCsv(payload.escuelas || []);
+      const carCsv = toCsv(payload.carreras || []);
+      const usersCsv = toCsv(payload.users || []);
+
+      const download = (name: string, content: string) => {
+        if (!content) return;
+        // Prepend UTF-8 BOM so Excel on Windows recognizes UTF-8 and shows accents correctly
+        const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      // trigger downloads (one by one)
+      download('escuelas.csv', escCsv);
+      download('carreras.csv', carCsv);
+      download('users.csv', usersCsv);
+      this.message = 'CSV exportado.';
+    } catch (e) {
+      console.error('Error exporting CSV', e);
+      this.message = 'Error al exportar CSV.';
+    }
   }
 
   ngAfterViewInit(): void {
@@ -110,6 +313,21 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   closePopulationModal() {
     this.showPopulationModal = false;
+    // clear any per-escuela chart selection and destroy existing chart instance
+    this.chartCarreras = [];
+    if (this.populationChartObj) {
+      try { this.populationChartObj.destroy(); } catch (e) { /* ignore */ }
+      this.populationChartObj = null;
+    }
+  }
+
+  // Open modal showing only carreras of a single escuela (comparativa: inscritos vs poblacion esperada)
+  openEscuelaChart(escuelaId: string) {
+    // prepare carreras for the chart
+    this.chartCarreras = (this.carreras || []).filter(c => c.escuelaId === escuelaId);
+    this.showPopulationModal = true;
+    // delay render until modal & canvas are present
+    setTimeout(() => this.renderPopulationChart(), 0);
   }
 
   // file import handlers
@@ -261,6 +479,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   open(side: 'escuela' | 'carrera') {
     this.active = side;
     this.message = '';
+    // if opening the carrera creation form and the user is not admin,
+    // force the escuelaId to the user's assigned escuela and mark restriction
+    if (side === 'carrera') {
+      if (!this.isAdmin && this.currentUserEscuelaId) {
+        this.carreraForm.patchValue({ escuelaId: this.currentUserEscuelaId });
+        this.restrictCarreraToUserEscuela = true;
+      } else {
+        this.restrictCarreraToUserEscuela = false;
+      }
+    } else {
+      this.restrictCarreraToUserEscuela = false;
+    }
   }
 
   closeMenus() {
@@ -268,6 +498,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.message = '';
     this.editMode = false;
     this.selectedEscuelaId = null;
+    this.restrictCarreraToUserEscuela = false;
   }
 
   saveEscuela() {
@@ -298,6 +529,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.selectedEscuelaId = id;
     // deselect carrera when selecting escuela
     this.selectedCarreraId = null;
+    // when an escuela is selected, filter carreras to that escuela
+    if (id) {
+      this.carFilterEscuelaId = id;
+      this.viewingEscuelaId = id;
+      this.applyFilters();
+    }
   }
 
   // safer selection by index (used from table row clicks) to avoid stale/undefined ids
@@ -331,6 +568,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     // clear carrera selection when selecting escuela normally
     this.selectedCarreraIds.clear();
     this.selectedCarreraId = null;
+    // when single-select (not checkbox, not multi) set carrera filter to selected escuela
+    if (!multi) {
+      this.carFilterEscuelaId = id;
+      this.viewingEscuelaId = id;
+      this.applyFilters();
+    }
   }
 
   selectCarrera(id: string) {
@@ -488,6 +731,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       this.contextMenuVisible = false;
       this.contextMenuTarget = null;
     }
+    // hide profile dropdown as well
+    if (this.showProfileDropdown) this.showProfileDropdown = false;
   }
 
 
@@ -624,6 +869,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   saveCarrera() {
     if (this.carreraForm.invalid) return;
     const payload = { ...(this.carreraForm.value as any) };
+    // if the creation is restricted, enforce the escuelaId to the current user's escuela
+    if (this.restrictCarreraToUserEscuela && this.currentUserEscuelaId) {
+      payload.escuelaId = this.currentUserEscuelaId;
+    }
     // ensure numeric
     if (payload.studentsCount !== undefined) payload.studentsCount = Number(payload.studentsCount) || 0;
     if (payload.expectedPopulation !== undefined) payload.expectedPopulation = Number(payload.expectedPopulation) || 0;
@@ -647,35 +896,236 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     if (this.showPopulationModal) setTimeout(() => this.renderPopulationChart(), 0);
   }
 
-  // JSON import/export (without logos)
-  onJsonFileChange(evt: Event) {
-    const input = evt.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const txt = reader.result as string;
-        const parsed = JSON.parse(txt);
-        // expect { escuelas: [...], carreras: [...] }
-        if (!parsed || (typeof parsed !== 'object')) {
-          this.message = 'Archivo JSON inválido.';
-          return;
+  // Export escuelas with their carreras as a CSV where each row is one carrera (escuela columns duplicated).
+  exportEscuelasWithCarrerasCsv() {
+    const escuelas = this.data.getEscuelas() || [];
+    const carreras = this.data.getCarreras() || [];
+
+    // build rows: one row per carrera; if escuela has no carreras, include one row with empty carrera fields
+    const rows: any[] = [];
+    for (const e of escuelas) {
+      const escCarreras = carreras.filter(c => c.escuelaId === e.id);
+      if (escCarreras.length === 0) {
+        rows.push({
+          nombre: e.nombre || '',
+          cct: e.cct || '',
+          telefono: e.telefono || '',
+          extension: e.extension || '',
+          correo: e.correo || '',
+          representanteNombre: e.representanteNombre || '',
+          representantePuesto: e.representantePuesto || '',
+          direccion: e.direccion || '',
+          pagina: e.pagina || '',
+          encargadoRegistro: e.encargadoRegistro || '',
+          carrera_nombre: '',
+          carrera_codigo: '',
+          carrera_alumnos: '',
+          carrera_poblacion_esperada: ''
+        });
+      } else {
+        for (const c of escCarreras) {
+          rows.push({
+            nombre: e.nombre || '',
+            cct: e.cct || '',
+            telefono: e.telefono || '',
+            extension: e.extension || '',
+            correo: e.correo || '',
+            representanteNombre: e.representanteNombre || '',
+            representantePuesto: e.representantePuesto || '',
+            direccion: e.direccion || '',
+            pagina: e.pagina || '',
+            encargadoRegistro: e.encargadoRegistro || '',
+            carrera_nombre: c.name || '',
+            carrera_codigo: c.code || '',
+            carrera_alumnos: (c.studentsCount ?? '').toString(),
+            carrera_poblacion_esperada: (c.expectedPopulation ?? '').toString()
+          });
         }
-        this.data.setAll({ escuelas: parsed.escuelas || [], carreras: parsed.carreras || [] }, { stripLogos: true });
-        this.refreshData();
-        this.message = 'Datos importados desde JSON (logos omitidos).';
-      } catch (err) {
-        console.error('Error importando JSON', err);
-        this.message = 'Error al importar JSON.';
       }
-    };
-    reader.onerror = () => {
-      this.message = 'Error leyendo el archivo.';
-    };
-    reader.readAsText(file);
-    // clear the input value so same file can be reselected later
-    input.value = '';
+    }
+
+    // define header order for clarity
+    const headers = [
+      'nombre','cct','telefono','extension','correo','representanteNombre','representantePuesto','direccion','pagina','encargadoRegistro',
+      'carrera_nombre','carrera_codigo','carrera_alumnos','carrera_poblacion_esperada'
+    ];
+
+    const esc = (v: any) => v == null ? '' : String(v).replace(/"/g, '""');
+    const lines = [headers.join(',')];
+    for (const r of rows) {
+      const line = headers.map(h => `"${esc((r as any)[h])}"`).join(',');
+      lines.push(line);
+    }
+
+    try {
+      const csv = lines.join('\n');
+      if (!csv) { this.message = 'No hay datos para exportar.'; return; }
+      // Add BOM to help Excel detect UTF-8 encoding (fixes characters like ó, á, ñ)
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'escuelas_carreras.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      this.message = 'Exportación CSV completada.';
+    } catch (err) {
+      console.error('Error exportando escuelas CSV', err);
+      this.message = 'Error al exportar escuelas.';
+    }
+  }
+
+  // Export only instituciones (escuelas) as CSV (one row per escuela, no id)
+  exportInstitucionesCsv() {
+    const escuelas = this.data.getEscuelas() || [];
+    if (!Array.isArray(escuelas) || escuelas.length === 0) {
+      this.message = 'No hay instituciones para exportar.';
+      return;
+    }
+
+    const headers = ['nombre','cct','telefono','extension','correo','representanteNombre','representantePuesto','direccion','pagina','encargadoRegistro'];
+    const esc = (v: any) => v == null ? '' : String(v).replace(/"/g, '""');
+    const lines = [headers.join(',')];
+    for (const e of escuelas) {
+      const row = [
+        `"${esc(e.nombre)}"`,
+        `"${esc(e.cct)}"`,
+        `"${esc(e.telefono)}"`,
+        `"${esc(e.extension)}"`,
+        `"${esc(e.correo)}"`,
+        `"${esc(e.representanteNombre)}"`,
+        `"${esc(e.representantePuesto)}"`,
+        `"${esc(e.direccion)}"`,
+        `"${esc(e.pagina)}"`,
+        `"${esc(e.encargadoRegistro)}"`
+      ];
+      lines.push(row.join(','));
+    }
+
+    try {
+      const csv = lines.join('\n');
+      // Prepend UTF-8 BOM so Excel opens the CSV with correct encoding
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `instituciones.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.message = 'Exportación de instituciones completada.';
+    } catch (err) {
+      console.error('Error exportando instituciones CSV', err);
+      this.message = 'Error al exportar instituciones.';
+    }
+  }
+
+  // Export a single escuela and its carreras as CSV (one row)
+  exportEscuelaWithCarrerasCsv(id: string) {
+    const e = this.data.getEscuelas().find(x => x.id === id);
+    if (!e) { this.message = 'Escuela no encontrada.'; return; }
+    const escCarreras = (this.carreras || []).filter(c => c.escuelaId === e.id).map(c => ({ id: c.id, name: c.name, code: c.code, studentsCount: c.studentsCount ?? 0, expectedPopulation: c.expectedPopulation ?? 0 }));
+    // build rows for this single escuela similar to the multi-export
+    const rows: any[] = [];
+    if (escCarreras.length === 0) {
+      rows.push({
+        nombre: e.nombre || '',
+        cct: e.cct || '',
+        telefono: e.telefono || '',
+        extension: e.extension || '',
+        correo: e.correo || '',
+        representanteNombre: e.representanteNombre || '',
+        representantePuesto: e.representantePuesto || '',
+        direccion: e.direccion || '',
+        pagina: e.pagina || '',
+        encargadoRegistro: e.encargadoRegistro || '',
+        carrera_nombre: '',
+        carrera_codigo: '',
+        carrera_alumnos: '',
+        carrera_poblacion_esperada: ''
+      });
+    } else {
+      for (const c of escCarreras) {
+        rows.push({
+          nombre: e.nombre || '',
+          cct: e.cct || '',
+          telefono: e.telefono || '',
+          extension: e.extension || '',
+          correo: e.correo || '',
+          representanteNombre: e.representanteNombre || '',
+          representantePuesto: e.representantePuesto || '',
+          direccion: e.direccion || '',
+          pagina: e.pagina || '',
+          encargadoRegistro: e.encargadoRegistro || '',
+          carrera_nombre: c.name || '',
+          carrera_codigo: c.code || '',
+          carrera_alumnos: (c.studentsCount ?? '').toString(),
+          carrera_poblacion_esperada: (c.expectedPopulation ?? '').toString()
+        });
+      }
+    }
+
+    const headers = [
+      'nombre','cct','telefono','extension','correo','representanteNombre','representantePuesto','direccion','pagina','encargadoRegistro',
+      'carrera_nombre','carrera_codigo','carrera_alumnos','carrera_poblacion_esperada'
+    ];
+    const esc = (v: any) => v == null ? '' : String(v).replace(/"/g, '""');
+    const lines = [headers.join(',')];
+    for (const r of rows) {
+      const line = headers.map(h => `"${esc((r as any)[h])}"`).join(',');
+      lines.push(line);
+    }
+
+    try {
+      const csv = lines.join('\n');
+      // Add BOM so Excel displays accented characters correctly
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = (e.nombre || 'escuela').replace(/[^a-z0-9_-]/gi, '_');
+      a.download = `escuela_${safeName}_carreras.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.message = 'Descarga completada.';
+    } catch (err) {
+      console.error('Error descargando escuela CSV', err);
+      this.message = 'Error al descargar escuela.';
+    }
+  }
+
+  // Download an Excel template showing how to format 'escuelas' import
+  exportTemplateEscuelasExcel() {
+    try {
+      const headers = ['nombre','cct','telefono','extension','correo','representanteNombre','representantePuesto','direccion','pagina','encargadoRegistro'];
+      const sample = ['Instituto Ejemplo','CCT0001','(000) 000-0000','','contacto@ejemplo.com','Dr. Ejemplo','Director','Av. Ejemplo 123','https://ejemplo.mx','Nombre Encargado'];
+      const aoa = [headers, sample];
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Escuelas');
+      XLSX.writeFile(wb, 'plantilla_escuelas.xlsx');
+      this.message = 'Plantilla de escuelas descargada.';
+    } catch (err) {
+      console.error('Error generando plantilla escuelas', err);
+      this.message = 'Error al generar plantilla de escuelas.';
+    }
+  }
+
+  // Download an Excel template showing how to format 'carreras' import
+  exportTemplateCarrerasExcel() {
+    try {
+      // Use 'escuela' column (name) because import tries to resolve escuela by name
+      const headers = ['name','code','escuela','studentsCount','expectedPopulation'];
+      const sample = ['Ingeniería de Ejemplo','IE','Instituto Ejemplo','0','120'];
+      const aoa = [headers, sample];
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Carreras');
+      XLSX.writeFile(wb, 'plantilla_carreras.xlsx');
+      this.message = 'Plantilla de carreras descargada.';
+    } catch (err) {
+      console.error('Error generando plantilla carreras', err);
+      this.message = 'Error al generar plantilla de carreras.';
+    }
   }
 
   exportJsonNoLogos() {
@@ -722,7 +1172,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     });
     // carreras
     this.displayedCarreras = this.carreras.filter(c => {
-      if (this.carFilterEscuelaId && this.carFilterEscuelaId !== '') {
+      // if not admin, restrict to current user's escuela
+      if (!this.isAdmin && this.currentUserEscuelaId) {
+        if (c.escuelaId !== this.currentUserEscuelaId) return false;
+      } else if (this.carFilterEscuelaId && this.carFilterEscuelaId !== '') {
         if (c.escuelaId !== this.carFilterEscuelaId) return false;
       }
       if (!s) return true;
@@ -781,8 +1234,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   // Chart rendering for expected population per carrera
   private renderPopulationChart() {
     try {
-      const labels = this.displayedCarreras.map(c => c.name || '(sin nombre)');
-      const data = this.displayedCarreras.map(c => Number(c.expectedPopulation || 0));
+      // choose source: if chartCarreras has items, use them; otherwise use displayedCarreras
+      const source = (this.chartCarreras && this.chartCarreras.length) ? this.chartCarreras : this.displayedCarreras;
+      const labels = source.map(c => c.name || '(sin nombre)');
+      const expectedData = source.map(c => Number(c.expectedPopulation || 0));
+      const enrolledData = source.map(c => Number(c.studentsCount || 0));
 
       const ctx = this.populationChart?.nativeElement as HTMLCanvasElement | undefined;
       if (!ctx) return;
@@ -799,8 +1255,13 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           labels,
           datasets: [
             {
+              label: 'Alumnos inscritos',
+              data: enrolledData,
+              backgroundColor: 'rgba(75,192,192,0.6)'
+            },
+            {
               label: 'Población esperada',
-              data,
+              data: expectedData,
               backgroundColor: 'rgba(54,162,235,0.6)'
             }
           ]

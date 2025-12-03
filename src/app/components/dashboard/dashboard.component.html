@@ -2,9 +2,32 @@
   <header class="top">
     <div class="container">
       <h3>CRM Escuelas</h3>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="user">Hola, <strong>{{ userName }}</strong></div>
-        <button class="logout" (click)="logout()">Cerrar sesión</button>
+      <div style="display:flex;align-items:center;gap:12px;position:relative">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="small-avatar" style="width:32px;height:32px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f1f5f9;border:1px solid #e6e9ef;color:#0f172a;font-weight:700">
+            <img *ngIf="profilePhotoPreview" [src]="profilePhotoPreview" alt="avatar" style="width:100%;height:100%;object-fit:cover" />
+            <span *ngIf="!profilePhotoPreview">{{ userName?.charAt(0) || '?' }}</span>
+          </div>
+          <div class="user">Hola, <strong>{{ userName }}</strong></div>
+        </div>
+        <div class="profile-dropdown" style="position:relative">
+          <button class="mini" (click)="$event.stopPropagation(); showProfileDropdown = !showProfileDropdown">Mi cuenta ▾</button>
+          <div *ngIf="showProfileDropdown" class="dropdown-menu" (click)="$event.stopPropagation()" style="position:absolute;right:0;top:36px;background:#fff;border:1px solid #eef2f6;border-radius:8px;padding:8px;box-shadow:0 8px 20px rgba(2,6,23,0.12);z-index:80;min-width:200px">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px">
+              <div class="avatar" style="width:40px;height:40px;border-radius:50%;overflow:hidden;flex:0 0 40px;border:1px solid #e6e9ef;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:#0f172a;font-weight:700">
+                <img *ngIf="profilePhotoPreview" [src]="profilePhotoPreview" alt="avatar" style="width:100%;height:100%;object-fit:cover" />
+                <span *ngIf="!profilePhotoPreview">{{ userName?.charAt(0) || '?' }}</span>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700">{{ userName }}</div>
+                <div style="font-size:12px;color:#64748b">{{ getCurrentUserEmail() }}</div>
+              </div>
+            </div>
+            <hr style="margin:6px 0;border:0;height:1px;background:#f1f5f9" />
+            <button class="mini" style="width:100%;text-align:left;margin-bottom:6px" (click)="openProfileModal(); showProfileDropdown=false">Editar perfil</button>
+            <button class="mini" style="width:100%;text-align:left" (click)="logout()">Cerrar sesión</button>
+          </div>
+        </div>
       </div>
       
     </div>
@@ -20,9 +43,28 @@
         <div style="margin-top:12px;font-weight:600">Importando archivo...</div>
       </div>
     </div>
+    <aside class="side-menu" [class.collapsed]="!menuOpen">
+      <div class="menu-toggle">
+        <button class="mini" (click)="toggleMenu()">{{ menuOpen ? 'Cerrar' : 'Abrir' }}</button>
+      </div>
+      <div class="menu-box" *ngIf="menuOpen">
+        <h4>Acciones</h4>
+        <button *ngIf="isAdmin" (click)="open('escuela')">Registrar escuela</button>
+        <button *ngIf="isAdmin || currentUserEscuelaId" (click)="open('carrera')">Registrar carrera</button>
+        <hr />
+        <button class="mini" (click)="exportEscuelasWithCarrerasCsv()">Exportar escuelas (CSV)</button>
+        <button class="mini" (click)="exportInstitucionesCsv()">Exportar instituciones (CSV)</button>
+        <button *ngIf="isAdmin" class="mini" (click)="exportTemplateEscuelasExcel()">Descargar plantilla (Escuelas)</button>
+        <button *ngIf="isAdmin" class="mini" (click)="exportTemplateCarrerasExcel()">Descargar plantilla (Carreras)</button>
+        <hr />
+      </div>
+      <div class="menu-box" *ngIf="!menuOpen">
+        <div style="padding:12px">Menú</div>
+      </div>
+    </aside>
+
     <section class="content">
-      <h4>Bienvenido{{ userName ? (', ' + userName) : '' }}.</h4>
-      <p>Desde aquí puedes registrar escuelas y carreras usando el menú a la derecha.</p>
+      <p>Desde aquí puedes registrar escuelas y carreras usando el menú.</p>
 
       <div *ngIf="message" class="message">{{ message }}</div>
 
@@ -34,111 +76,81 @@
           Sólo escuelas con carreras
         </label>
 
-        <label class="inline-filter">Filtrar carreras por escuela
+        <label *ngIf="isAdmin" class="inline-filter">Filtrar carreras por escuela
           <select (change)="carFilterEscuelaId = $any($event.target).value; applyFilters()">
             <option value="">-- Todas las escuelas --</option>
             <option *ngFor="let e of escuelas" [value]="e.id">{{ e.nombre }}</option>
           </select>
         </label>
+        <label *ngIf="!isAdmin" class="inline-filter">Mostrando carreras de: <strong>{{ getEscuelaNombre(currentUserEscuelaId || '') }}</strong></label>
 
         <button class="mini" (click)="searchTerm=''; carFilterEscuelaId=''; showOnlyWithCarreras=false; applyFilters()">Limpiar</button>
       </div>
 
       <div class="lists">
-        <div class="list">
+        <div class="list" *ngIf="isAdmin">
           <h5>Escuelas</h5>
-          <div class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('escuela')" (dragleave)="onImportDragLeave('escuela')" (drop)="onDropFiles($event,'escuela'); onImportDragLeave('escuela')" [class.dragover]="draggingEscuela">
+          <div *ngIf="isAdmin" class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('escuela')" (dragleave)="onImportDragLeave('escuela')" (drop)="onDropFiles($event,'escuela'); onImportDragLeave('escuela')" [class.dragover]="draggingEscuela">
             <input type="file" accept=".xlsx,.xls,.csv" #escFile hidden (change)="onEscuelasFileChange($event)" />
             <button class="mini" (click)="escFile.click()">Importar Excel (Escuelas)</button>
             <small class="muted">o arrastra un archivo aquí</small>
           </div>
-          <table class="table big-table">
-            <thead>
-              <tr>
-                <th style="width:40px"><input type="checkbox" [checked]="displayedEscuelas.length>0 && selectedEscuelaIds.size===displayedEscuelas.length" (change)="toggleSelectAllEscuelas($event)" /></th>
-                <th>Logo</th>
-                <th>Nombre</th>
-                <th>CCT</th>
-                <th>Teléfono</th>
-                <th>Representante</th>
-                <th>Encargado de registro</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let e of displayedEscuelas; let i = index; trackBy: trackByEscuela" (click)="selectEscuelaByIndex(i, $event)" (contextmenu)="onRowContextMenu($event,'escuela',e.id)" [class.selected]="isSelectedEscuela(e.id)">
-                <td>
-                  <input type="checkbox" [checked]="isSelectedEscuela(e.id)" (click)="$event.stopPropagation()" (change)="selectEscuelaByIndex(i, $any($event))" />
-                </td>
-                <td class="esc-logo-cell">
-                  <img *ngIf="e.logo" [src]="e.logo" alt="logo" />
-                </td>
-                <td>{{ e.nombre }}</td>
-                <td>{{ e.cct }}</td>
-                <td>{{ e.telefono }} <span *ngIf="e.extension">ext. {{ e.extension }}</span></td>
-                <td>{{ e.representanteNombre }} <small class="muted">{{ e.representantePuesto }}</small></td>
-                <td>{{ e.encargadoRegistro }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="card-grid">
+            <div *ngFor="let e of displayedEscuelas; trackBy: trackByEscuela" class="card-item" (click)="showCarrerasOfEscuela(e.id)" [class.selected]="viewingEscuelaId===e.id">
+              <div class="card-top">
+                <img *ngIf="e.logo" [src]="e.logo" class="card-logo" alt="logo" />
+                <div>
+                  <div class="card-title">{{ e.nombre }}</div>
+                  <div class="card-sub">{{ e.cct }}</div>
+                  <div class="card-meta">{{ e.representanteNombre }} <small class="muted">{{ e.representantePuesto }}</small></div>
+                </div>
+              </div>
+              <div class="card-meta">Encargado: {{ e.encargadoRegistro }}</div>
+              <div class="card-actions">
+                <button (click)="$event.stopPropagation(); showCarrerasOfEscuela(e.id)">Ver carreras</button>
+                <button class="mini" *ngIf="isAdmin || currentUserEscuelaId === e.id" (click)="$event.stopPropagation(); openEscuelaChart(e.id)">Ver gráfico</button>
+                <button class="mini" (click)="$event.stopPropagation(); exportEscuelaWithCarrerasCsv(e.id)">Descargar CSV</button>
+                <button *ngIf="isAdmin" class="ghost" (click)="$event.stopPropagation(); editEscuelaById(e.id)">Editar</button>
+                <button *ngIf="isAdmin" class="ghost" (click)="$event.stopPropagation(); deleteEscuelaById(e.id)">Eliminar</button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="list">
-          <h5 style="display:flex;align-items:center;gap:12px">Carreras <button class="mini" style="margin-left:8px" (click)="openPopulationModal()">Ver gráfico</button></h5>
-          <div class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('carrera')" (dragleave)="onImportDragLeave('carrera')" (drop)="onDropFiles($event,'carrera'); onImportDragLeave('carrera')" [class.dragover]="draggingCarrera">
+        <div class="list carreras">
+          <h5 style="display:flex;align-items:center;gap:12px">
+            <span *ngIf="!viewingEscuelaId">Carreras</span>
+            <span *ngIf="viewingEscuelaId">Carreras de {{ getEscuelaNombre(viewingEscuelaId) }}</span>
+            <button class="mini" style="margin-left:8px" (click)="openPopulationModal()">Ver gráfico</button>
+            <button *ngIf="viewingEscuelaId" class="mini" style="margin-left:8px" (click)="clearViewingEscuela()">Volver</button>
+          </h5>
+          <div *ngIf="isAdmin" class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('carrera')" (dragleave)="onImportDragLeave('carrera')" (drop)="onDropFiles($event,'carrera'); onImportDragLeave('carrera')" [class.dragover]="draggingCarrera">
             <input type="file" accept=".xlsx,.xls,.csv" #carFile hidden (change)="onCarrerasFileChange($event)" />
             <button class="mini" (click)="carFile.click()">Importar Excel (Carreras)</button>
             <small class="muted">o arrastra un archivo aquí</small>
           </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th style="width:40px"><input type="checkbox" [checked]="displayedCarreras.length>0 && selectedCarreraIds.size===displayedCarreras.length" (change)="toggleSelectAllCarreras($event)" /></th>
-                <th>Logo</th>
-                <th>Nombre</th>
-                <th>Código</th>
-                <th>Alumnos</th>
-                <th>Población esperada</th>
-                <th>Escuela</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let c of displayedCarreras; let j = index; trackBy: trackByCarrera" (click)="selectCarreraByIndex(j, $event)" (contextmenu)="onRowContextMenu($event,'carrera',c.id)" [class.selected]="isSelectedCarrera(c.id)">
-                <td>
-                  <input type="checkbox" [checked]="isSelectedCarrera(c.id)" (click)="$event.stopPropagation()" (change)="selectCarreraByIndex(j, $any($event))" />
-                </td>
-                <td class="car-logo-cell">
-                  <img *ngIf="c.logo" [src]="c.logo" alt="logo carrera" />
-                </td>
-                <td>{{ c.name }}</td>
-                <td>{{ c.code }}</td>
-                <td class="alumnos">{{ c.studentsCount ?? 0 }}</td>
-                <td class="alumnos">{{ c.expectedPopulation ?? 0 }}</td>
-                <td>{{ getEscuelaNombre(c.escuelaId) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="card-grid">
+            <div *ngFor="let c of displayedCarreras; trackBy: trackByCarrera" class="card-item">
+              <div class="card-top">
+                <img *ngIf="c.logo" [src]="c.logo" class="card-logo" alt="logo carrera" />
+                <div>
+                  <div class="card-title">{{ c.name }}</div>
+                  <div class="card-sub">{{ c.code }}</div>
+                  <div class="card-meta">Alumnos: {{ c.studentsCount ?? 0 }} · Población esperada: {{ c.expectedPopulation ?? 0 }}</div>
+                </div>
+              </div>
+              <div class="card-meta">Instituto: {{ getEscuelaNombre(c.escuelaId) }}</div>
+              <div class="card-actions">
+                <button *ngIf="isAdmin" (click)="editCarreraById(c.id)">Editar</button>
+                <button *ngIf="isAdmin" class="ghost" (click)="deleteCarreraById(c.id)">Eliminar</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <aside class="right-menu">
-      <div class="menu-box">
-        <h4>Acciones</h4>
-        <button (click)="open('escuela')">Registrar escuela</button>
-        <button (click)="open('carrera')">Registrar carrera</button>
-        <hr />
-        <input type="file" accept="application/json" #jsonFile hidden (change)="onJsonFileChange($event)" />
-        <button class="mini" (click)="jsonFile.click()">Importar JSON (sin logos)</button>
-        <button class="mini" (click)="exportJsonNoLogos()">Exportar JSON (sin logos)</button>
-        <hr />
-  <button [disabled]="selectedEscuelaIds.size !== 1" (click)="startEditSelected()">Actualizar escuela seleccionado</button>
-  <button [disabled]="selectedEscuelaIds.size === 0" (click)="deleteSelectedEscuelas()">Eliminar escuelas seleccionadas</button>
-        <hr />
-  <button [disabled]="selectedCarreraIds.size !== 1" (click)="startEditSelectedCarrera()">Actualizar carrera seleccionada</button>
-  <button [disabled]="selectedCarreraIds.size === 0" (click)="deleteSelectedCarreras()">Eliminar carreras seleccionadas</button>
-      </div>
-      <!-- forms are now presented as centered modals; inline forms removed -->
-    </aside>
+    <!-- forms are now presented as centered modals; inline forms removed -->
   </main>
   <!-- Escuela modal (centered) -->
   <div class="modal-overlay" *ngIf="active === 'escuela'" (click)="closeMenus()">
@@ -205,11 +217,15 @@
             <div *ngIf="carreraLogoPreview" class="logo-preview">
               <img [src]="carreraLogoPreview" alt="Logo carrera preview" />
             </div>
-            <label>Escuela
+            <label *ngIf="isAdmin">Escuela
               <select formControlName="escuelaId">
                 <option value="">-- Seleccionar escuela --</option>
                 <option *ngFor="let e of escuelas" [value]="e.id">{{ e.nombre }}</option>
               </select>
+            </label>
+            <label *ngIf="!isAdmin">Escuela
+              <input type="text" [value]="getEscuelaNombre(currentUserEscuelaId || '')" disabled />
+              <input type="hidden" formControlName="escuelaId" />
             </label>
             <label>Población esperada
               <input type="number" formControlName="expectedPopulation" placeholder="0" min="0" />
@@ -226,6 +242,39 @@
 
   <!-- confirm modal (service-controlled) -->
   <app-confirm-modal></app-confirm-modal>
+    <!-- Profile modal -->
+    <div class="modal-overlay" *ngIf="showProfileModal" (click)="closeProfileModal()">
+      <div class="modal-card form-modal" style="max-width:520px;" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h3>Mi perfil</h3>
+          <button class="mini" (click)="closeProfileModal()">Cerrar</button>
+        </header>
+        <div class="modal-body">
+          <div class="form-box">
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+              <label>Nombre
+                <input formControlName="name" placeholder="Tu nombre" /></label>
+              <label>Email
+                <input formControlName="email" placeholder="Correo electrónico" /></label>
+              <label>Nueva contraseña (dejar en blanco para no cambiar)
+                <input type="password" formControlName="password" placeholder="Nueva contraseña" /></label>
+              <label>Confirmar contraseña
+                <input type="password" formControlName="confirmPassword" placeholder="Confirmar" /></label>
+              <label class="file-label">Foto de perfil
+                <input type="file" accept="image/*" (change)="onProfilePhotoChange($event)" />
+              </label>
+              <div *ngIf="profilePhotoPreview" class="logo-preview">
+                <img [src]="profilePhotoPreview" alt="preview" />
+              </div>
+              <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button type="button" class="mini" (click)="closeProfileModal()">Cancelar</button>
+                <button type="submit" [disabled]="profileForm.invalid">Guardar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   <!-- Population chart modal -->
   <div class="modal-overlay" *ngIf="showPopulationModal" (click)="closePopulationModal()">
     <div class="modal-card" style="width:80%;max-width:900px;height:480px;" (click)="$event.stopPropagation()">
@@ -242,8 +291,9 @@
   </div>
   <!-- Context menu -->
   <div *ngIf="contextMenuVisible" class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY" (click)="$event.stopPropagation()">
-    <button (click)="contextAdd(contextMenuTarget?.type || 'escuela')">Agregar {{ contextMenuTarget?.type }}</button>
-    <button [disabled]="!contextMenuTarget?.id" (click)="contextEdit()">Editar {{ contextMenuTarget?.type }}</button>
-    <button [disabled]="!contextMenuTarget?.id" (click)="contextDelete()">Eliminar {{ contextMenuTarget?.type }}</button>
+    <button *ngIf="isAdmin" (click)="contextAdd(contextMenuTarget?.type || 'escuela')">Agregar {{ contextMenuTarget?.type }}</button>
+    <button *ngIf="isAdmin" [disabled]="!contextMenuTarget?.id" (click)="contextEdit()">Editar {{ contextMenuTarget?.type }}</button>
+    <button *ngIf="isAdmin" [disabled]="!contextMenuTarget?.id" (click)="contextDelete()">Eliminar {{ contextMenuTarget?.type }}</button>
+    <div *ngIf="!isAdmin" style="padding:8px;color:#666">Acciones administrativas no disponibles</div>
   </div>
 </div>

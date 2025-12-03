@@ -1,30 +1,45 @@
-<div class="auth-page">
-  <div class="card">
-    <h2>Crear cuenta</h2>
+<div class="auth-page" style="display:flex;align-items:center;justify-content:center;padding:40px 12px;">
+  <div class="card" style="width:360px;padding:26px;border-radius:10px;box-shadow:0 6px 18px rgba(10,20,30,0.06);background:#fff">
+    <h2 style="margin:0 0 16px 0;font-size:20px">Crear cuenta</h2>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <label>
-        <input formControlName="name" type="text" placeholder="Nombre completo" />
-      </label>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" style="display:flex;flex-direction:column;gap:12px">
+      <input formControlName="name" type="text" placeholder="Nombre completo" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px" />
 
-      <label>
-        <input formControlName="email" type="email" placeholder="Correo electrónico" />
-      </label>
+      <input formControlName="email" type="email" placeholder="Correo electrónico" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px" />
 
-      <label>
-        <input formControlName="password" type="password" placeholder="Contraseña" />
-      </label>
+      <input formControlName="password" type="password" placeholder="Contraseña" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px" />
 
-      <label>
-        <input formControlName="confirm" type="password" placeholder="Repetir contraseña" />
-      </label>
+      <input formControlName="confirm" type="password" placeholder="Repetir contraseña" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px" />
 
-      <div *ngIf="error" class="error">{{ error }}</div>
-      <div *ngIf="success" class="success">{{ success }}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="font-size:13px;color:#334155">Rol</label>
+        <select formControlName="role" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;background:#fff;font-size:14px">
+          <option value="user">Usuario (normal)</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
 
-      <button type="submit" [disabled]="form.invalid">Crear cuenta</button>
+      <!-- if user: pick instituto -->
+      <div *ngIf="form.get('role')?.value === 'user'" style="display:flex;flex-direction:column;gap:6px">
+        <label style="font-size:13px;color:#334155">Instituto al que perteneces</label>
+        <select formControlName="escuelaId" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;background:#fff;font-size:14px">
+          <option value="">-- Seleccionar instituto --</option>
+          <option *ngFor="let e of escuelas" [value]="e.id">{{ e.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- if admin: require existing admin credentials to authorize -->
+      <div *ngIf="form.get('role')?.value === 'admin'" style="display:flex;flex-direction:column;gap:8px">
+        <input formControlName="adminAuthorizerEmail" type="email" placeholder="Email de admin autorizador" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px" />
+        <input formControlName="adminAuthorizerPassword" type="password" placeholder="Contraseña del admin autorizador" style="width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px" />
+      </div>
+
+      <div *ngIf="error" class="error" style="color:#b91c1c;font-size:13px">{{ error }}</div>
+      <div *ngIf="success" class="success" style="color:#166534;font-size:13px">{{ success }}</div>
+
+      <button type="submit" [disabled]="form.invalid" style="margin-top:6px;background:#1565c0;color:#fff;padding:10px 14px;border-radius:8px;border:0;font-weight:600;font-size:15px">Crear cuenta</button>
     </form>
 
-    <p class="muted">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+    <p class="muted" style="margin-top:14px;font-size:13px;color:#64748b">¿Ya tienes cuenta? <a routerLink="/login" style="color:#5b21b6">Inicia sesión</a></p>
   </div>
 </div>

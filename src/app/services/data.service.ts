@@ -26,10 +26,22 @@ export interface Carrera {
   logo?: string; // base64 or url
 }
 
+export interface UserItem {
+  name?: string;
+  email: string;
+  // passwords are stored in localStorage by AuthService; avoid sending them to disk
+  password?: string;
+  // role: 'admin' | 'user'
+  role?: string;
+  // if role === 'user', the escuela (institution) the user belongs to
+  escuelaId?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private escKey = 'crm_escuelas_v1';
   private carKey = 'crm_carreras_v1';
+  private usersKey = 'crm_users_v1';
 
   // simple in-memory counter to help generate unique ids
   private idCounter = 0;
@@ -118,6 +130,34 @@ export class DataService {
     return normalized as Escuela[];
   }
 
+  // users handling (kept lightweight — AuthService still manages auth flows)
+  getUsers(): UserItem[] {
+    return this.read<UserItem>(this.usersKey) || [];
+  }
+
+  addUser(u: UserItem) {
+    const arr = this.getUsers();
+    arr.push(u);
+    this.write(this.usersKey, arr as any);
+    return true;
+  }
+
+  updateUser(email: string, patch: Partial<UserItem>) {
+    const arr = this.getUsers();
+    const idx = arr.findIndex(x => x.email === email);
+    if (idx === -1) return false;
+    arr[idx] = { ...arr[idx], ...patch };
+    this.write(this.usersKey, arr as any);
+    return true;
+  }
+
+  deleteUser(email: string) {
+    const arr = this.getUsers();
+    const filtered = arr.filter(x => x.email !== email);
+    this.write(this.usersKey, filtered as any);
+    return true;
+  }
+
   addEscuela(e: Omit<Escuela, 'id'>) {
     const arr = this.getEscuelas();
   const id = this.generateUniqueId('esc');
@@ -185,7 +225,8 @@ export class DataService {
   exportAll() {
     return {
       escuelas: this.getEscuelas(),
-      carreras: this.getCarreras()
+      carreras: this.getCarreras(),
+      users: this.getUsers()
     };
   }
 
@@ -203,14 +244,16 @@ export class DataService {
       if ('logo' in copy) delete copy.logo;
       return copy;
     });
-    return { escuelas: esc, carreras: car };
+    // include users (without passwords) in the export for disk save
+    const users = this.getUsers().map(u => ({ name: u.name, email: u.email, role: u.role, escuelaId: u.escuelaId }));
+    return { escuelas: esc, carreras: car, users };
   }
 
   /**
    * Overwrite storage with provided data. Optionally strip logos.
    * Ensures all items have valid ids before writing.
    */
-  setAll(payload: { escuelas?: Partial<Escuela>[]; carreras?: Partial<Carrera>[] }, options?: { stripLogos?: boolean }) {
+  setAll(payload: { escuelas?: Partial<Escuela>[]; carreras?: Partial<Carrera>[]; users?: Partial<UserItem>[] }, options?: { stripLogos?: boolean }) {
     const escs: Escuela[] = (payload.escuelas || []).map((it, idx) => {
       const copy: any = { ...(it || {}) };
       if (!copy.id || copy.id === '' || copy.id === 'undefined') copy.id = this.generateUniqueId('esc');
@@ -228,6 +271,11 @@ export class DataService {
     // Persist
     this.write(this.escKey, escs as any);
     this.write(this.carKey, cars as any);
+    if (payload.users) {
+      // persist users as provided (do not strip passwords here)
+      const us: UserItem[] = (payload.users || []).map(u => ({ ...(u as any) }));
+      this.write(this.usersKey, us as any);
+    }
     return { escuelas: escs, carreras: cars };
   }
 }

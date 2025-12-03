@@ -11,6 +11,14 @@
         <input formControlName="password" type="password" placeholder="Contraseña" />
       </label>
 
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="font-size:13px;color:#334155">Rol</label>
+        <select formControlName="role" style="width:180px;padding:8px 10px;border:1px solid #e6e9ef;border-radius:8px;background:#fff;font-size:14px">
+          <option value="user">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+
       <div *ngIf="error" class="error">{{ error }}</div>
 
       <div id="recaptcha-container" style="margin:12px 0"></div>

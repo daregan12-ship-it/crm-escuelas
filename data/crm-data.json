@@ -1,22 +1,9 @@
 {
-  "savedAt": "2025-11-19T05:47:38.484Z",
+  "savedAt": "2025-12-02T23:30:41.887Z",
   "payload": {
     "escuelas": [
       {
-        "id": "esc_1762647440113",
-        "nombre": "Instituto Tecnológico de La Piedad",
-        "cct": "16DIT0015E",
-        "telefono": "3525262363",
-        "extension": "",
-        "correo": "maria.ac@piedad.tecnm.mx",
-        "representanteNombre": "Javier Jimenez Cortes",
-        "representantePuesto": "Director General",
-        "direccion": "Avenida Tecnologico Num. Ext. 2000, La Piedad de Cabadas La Piedad CP. 59379",
-        "pagina": "www.itlapiedad.edu.mx",
-        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
-      },
-      {
-        "id": "esc_1762848077500_4_ddr1um9yc",
+        "id": "esc_1764709406734_1_2vrm77898",
         "nombre": "Instituto Tecnologico de Aguascalientes",
         "cct": "01DIT0015C",
         "telefono": " +52 (449) 910 50 02",
@@ -29,7 +16,7 @@
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       },
       {
-        "id": "esc_1762848077501_5_42apt1t2n",
+        "id": "esc_1764709406734_2_i0htuijjc",
         "nombre": "Tecnológico Nacional de México Campus Monterrey",
         "cct": "19DIT0001A",
         "telefono": 8183749200,
@@ -42,7 +29,7 @@
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       },
       {
-        "id": "esc_1762848077501_6_vx5q3191n",
+        "id": "esc_1764709406735_3_mm62xnsea",
         "nombre": "Instituto Tecnológico de Pachuca",
         "cct": "13DIT0020T",
         "telefono": "771 711 3073 / 771 711 3596 / 771 711 3140 / 771 711 5119",
@@ -55,7 +42,7 @@
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       },
       {
-        "id": "esc_1762848077501_7_glk0dccvx",
+        "id": "esc_1764709406735_4_3kdpwimvh",
         "nombre": "Instituto Tecnológico de Estudios Superiores de Zamora",
         "cct": "30EIT0007O",
         "telefono": "351-520-0177",
@@ -68,7 +55,7 @@
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       },
       {
-        "id": "esc_1762848077501_8_ymzrucrc6",
+        "id": "esc_1764709406735_5_5xgn50gme",
         "nombre": "Instituto Tecnológico Superior de Xalapa",
         "cct": "30EIT0007O",
         "telefono": "(228) 165-05-25",
@@ -77,84 +64,108 @@
         "representanteNombre": "Omar Romero Sandoval",
         "representantePuesto": "Director General",
         "direccion": "Sección 5ta Reserva Territorial s/n, Col. Santa Bárbara, C.P. 91096, Xalapa, Veracruz",
-        "pagina": "https://www.itsx.edu.mx",
+        "pagina": "comunicacion@aguascalientes.tecnm.mx",
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       }
     ],
     "carreras": [
       {
-        "id": "car_1762661366338",
-        "name": "Tecnologias de la Información y Comunicación",
-        "code": "528AQWE41",
-        "escuelaId": "esc_1762647440113",
-        "studentsCount": 55,
-        "expectedPopulation": 100
-      },
-      {
-        "id": "car_1762848273039_1_jj1f6mdbc",
+        "id": "car_1764709426675_6_qrrx36ec8",
         "name": "Ingeniería en Administración",
         "code": "IA",
-        "escuelaId": "esc_1762848077500_4_ddr1um9yc",
+        "escuelaId": "esc_1764709406734_1_2vrm77898",
         "studentsCount": 50,
-        "expectedPopulation": 150
+        "expectedPopulation": 0
       },
       {
-        "id": "car_1762848273039_2_ki7pgx2wk",
+        "id": "car_1764709426676_7_r0vvk62st",
         "name": "Ingeniería en Gestión Empresarial",
         "code": "IGE",
-        "escuelaId": "esc_1762647440113",
+        "escuelaId": "esc_1764709406734_1_2vrm77898",
         "studentsCount": 125,
-        "expectedPopulation": 20
+        "expectedPopulation": 420
       },
       {
-        "id": "car_1762848273039_3_x2pn32xww",
+        "id": "car_1764709426676_8_ea50cq4s8",
         "name": "Ingeniería en Sistemas Computacionales",
         "code": "ISC",
-        "escuelaId": "esc_1762848077501_5_42apt1t2n",
+        "escuelaId": "esc_1764709406734_1_2vrm77898",
         "studentsCount": 200,
-        "expectedPopulation": 10
+        "expectedPopulation": 120
       },
       {
-        "id": "car_1762848273040_4_qcbocdqnu",
+        "id": "car_1764709426677_9_ensz9nu5o",
         "name": "Ingeniería en Tecnologías de la Información y Comunicaciones",
         "code": "ITIC",
-        "escuelaId": "esc_1762848077501_7_glk0dccvx",
-        "studentsCount": 100
+        "escuelaId": "",
+        "studentsCount": 100,
+        "expectedPopulation": 0
       },
       {
-        "id": "car_1762848273040_5_k38zd9e8g",
+        "id": "car_1764709426677_10_wuvsmrlu0",
         "name": "Ingeniería Bioquímica",
         "code": "IBQ",
-        "escuelaId": "esc_1762647440113",
-        "studentsCount": 123
+        "escuelaId": "",
+        "studentsCount": 123,
+        "expectedPopulation": 0
       },
       {
-        "id": "car_1762848273040_6_8o11wpagu",
+        "id": "car_1764709426677_11_k9r0plfbg",
         "name": "Ingeniería Industrial",
         "code": "II",
-        "escuelaId": "esc_1762848077501_8_ymzrucrc6",
-        "studentsCount": 330
+        "escuelaId": "",
+        "studentsCount": 330,
+        "expectedPopulation": 0
       },
       {
-        "id": "car_1762848273040_7_69u51cpvr",
+        "id": "car_1764709426678_12_e8fjux1t0",
         "name": "Ingeniería Mecatrónica",
         "code": "IM",
-        "escuelaId": "esc_1762848077501_5_42apt1t2n",
-        "studentsCount": 152
+        "escuelaId": "",
+        "studentsCount": 152,
+        "expectedPopulation": 0
       },
       {
-        "id": "car_1762848273040_8_lc4dafprx",
+        "id": "car_1764709426679_13_2i65dtopr",
         "name": "Ingeniería en Inteligencia Artificial",
         "code": "IIA",
-        "escuelaId": "esc_1762647440113",
-        "studentsCount": 5
+        "escuelaId": "",
+        "studentsCount": 5,
+        "expectedPopulation": 0
       },
       {
-        "id": "car_1762848273040_9_ni5rof4nk",
+        "id": "car_1764709426679_14_ksa0ykxxb",
         "name": "Contador Público",
         "code": "CP",
-        "escuelaId": "esc_1762848077500_4_ddr1um9yc",
-        "studentsCount": 0
+        "escuelaId": "",
+        "studentsCount": 0,
+        "expectedPopulation": 0
+      }
+    ],
+    "users": [
+      {
+        "name": "Andres Aurelio Palmerin Torres",
+        "email": "teamcap121@hotmail.com"
+      },
+      {
+        "name": "Sara Dayana Sanchez Torres",
+        "email": "sara@gmail.com"
+      },
+      {
+        "name": "Administrador por defecto",
+        "email": "admin@crm.local",
+        "role": "admin"
+      },
+      {
+        "name": "Andrés Aurelio Palmerin Torres",
+        "email": "daregan12@gmail.com",
+        "role": "admin"
+      },
+      {
+        "name": "Sara Torres",
+        "email": "123@gmail.com",
+        "role": "user",
+        "escuelaId": "esc_1764709406734_1_2vrm77898"
       }
     ]
   }

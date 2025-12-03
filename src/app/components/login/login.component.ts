@@ -26,7 +26,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      role: ['user']
     });
   }
 
@@ -174,8 +175,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
       return;
     }
     
-    const { email, password } = this.form.value;
-    const ok = this.auth.login(email ?? '', password ?? '');
+    const { email, password, role } = this.form.value;
+    const ok = this.auth.login(email ?? '', password ?? '', role ?? undefined);
     
     if (ok) {
       this.router.navigate(['/dashboard']);
