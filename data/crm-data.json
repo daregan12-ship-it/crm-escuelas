@@ -1,20 +1,7 @@
 {
-  "savedAt": "2025-12-02T23:30:41.887Z",
+  "savedAt": "2025-12-03T21:53:25.435Z",
   "payload": {
     "escuelas": [
-      {
-        "id": "esc_1764709406734_1_2vrm77898",
-        "nombre": "Instituto Tecnologico de Aguascalientes",
-        "cct": "01DIT0015C",
-        "telefono": " +52 (449) 910 50 02",
-        "extension": "",
-        "correo": "ita@aguascalientes.com",
-        "representanteNombre": "Dr. José Luis Gil Vázquez",
-        "representantePuesto": "Director general",
-        "direccion": "Av. Adolfo López Mateos #1801 Ote. Fracc. Bona Gens, C.P. 20255 Aguascalientes, Ags., México.",
-        "pagina": "comunicacion@aguascalientes.tecnm.mx",
-        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
-      },
       {
         "id": "esc_1764709406734_2_i0htuijjc",
         "nombre": "Tecnológico Nacional de México Campus Monterrey",
@@ -40,61 +27,35 @@
         "direccion": "Carretera México-Pachuca Km. 87.5, Col. Venta Prieta, Pachuca de Soto, Hidalgo",
         "pagina": "https://www.itpachuca.edu.mx",
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
-      },
-      {
-        "id": "esc_1764709406735_4_3kdpwimvh",
-        "nombre": "Instituto Tecnológico de Estudios Superiores de Zamora",
-        "cct": "30EIT0007O",
-        "telefono": "351-520-0177",
-        "extension": 1101,
-        "correo": "direcciongeneral@teczamora.mx",
-        "representanteNombre": "Mtro. Karlo Martín Samaguey Zamora",
-        "representantePuesto": "Director General",
-        "direccion": "Carretera Zamora-La Piedad Km 7, El Sáuz de Abajo, Zamora, Michoacán C.P. 59720",
-        "pagina": "https://www.teczamora.mx",
-        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
-      },
-      {
-        "id": "esc_1764709406735_5_5xgn50gme",
-        "nombre": "Instituto Tecnológico Superior de Xalapa",
-        "cct": "30EIT0007O",
-        "telefono": "(228) 165-05-25",
-        "extension": 101,
-        "correo": "direcciongeneral@itsx.edu.mx",
-        "representanteNombre": "Omar Romero Sandoval",
-        "representantePuesto": "Director General",
-        "direccion": "Sección 5ta Reserva Territorial s/n, Col. Santa Bárbara, C.P. 91096, Xalapa, Veracruz",
-        "pagina": "comunicacion@aguascalientes.tecnm.mx",
-        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       }
     ],
     "carreras": [
       {
-        "id": "car_1764709426675_6_qrrx36ec8",
+        "id": "car_1764798756272_1_s41bhfqkz",
         "name": "Ingeniería en Administración",
         "code": "IA",
-        "escuelaId": "esc_1764709406734_1_2vrm77898",
+        "escuelaId": "esc_1764709406734_2_i0htuijjc",
         "studentsCount": 50,
-        "expectedPopulation": 0
+        "expectedPopulation": 220
       },
       {
-        "id": "car_1764709426676_7_r0vvk62st",
+        "id": "car_1764798756273_2_7ibr2eh7u",
         "name": "Ingeniería en Gestión Empresarial",
         "code": "IGE",
-        "escuelaId": "esc_1764709406734_1_2vrm77898",
+        "escuelaId": "esc_1764709406734_2_i0htuijjc",
         "studentsCount": 125,
-        "expectedPopulation": 420
+        "expectedPopulation": 130
       },
       {
-        "id": "car_1764709426676_8_ea50cq4s8",
+        "id": "car_1764798756273_3_xq1jf91ge",
         "name": "Ingeniería en Sistemas Computacionales",
         "code": "ISC",
-        "escuelaId": "esc_1764709406734_1_2vrm77898",
+        "escuelaId": "esc_1764709406734_2_i0htuijjc",
         "studentsCount": 200,
-        "expectedPopulation": 120
+        "expectedPopulation": 250
       },
       {
-        "id": "car_1764709426677_9_ensz9nu5o",
+        "id": "car_1764798756273_4_tabdby6dr",
         "name": "Ingeniería en Tecnologías de la Información y Comunicaciones",
         "code": "ITIC",
         "escuelaId": "",
@@ -102,7 +63,7 @@
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764709426677_10_wuvsmrlu0",
+        "id": "car_1764798756274_5_4cmtdrchz",
         "name": "Ingeniería Bioquímica",
         "code": "IBQ",
         "escuelaId": "",
@@ -110,7 +71,7 @@
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764709426677_11_k9r0plfbg",
+        "id": "car_1764798756274_6_sf5szjswb",
         "name": "Ingeniería Industrial",
         "code": "II",
         "escuelaId": "",
@@ -118,7 +79,7 @@
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764709426678_12_e8fjux1t0",
+        "id": "car_1764798756275_7_w7r4om9fo",
         "name": "Ingeniería Mecatrónica",
         "code": "IM",
         "escuelaId": "",
@@ -126,7 +87,7 @@
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764709426679_13_2i65dtopr",
+        "id": "car_1764798756275_8_8ngyp895l",
         "name": "Ingeniería en Inteligencia Artificial",
         "code": "IIA",
         "escuelaId": "",
@@ -134,7 +95,7 @@
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764709426679_14_ksa0ykxxb",
+        "id": "car_1764798756275_9_066ste8ga",
         "name": "Contador Público",
         "code": "CP",
         "escuelaId": "",

@@ -1019,6 +1019,80 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // Export carreras as CSV (global)
+  exportCarrerasCsvGlobal() {
+    const carreras = this.data.getCarreras() || [];
+    if (!Array.isArray(carreras) || carreras.length === 0) {
+      this.message = 'No hay carreras para exportar.';
+      return;
+    }
+    const headers = ['name','code','escuela','studentsCount','expectedPopulation'];
+    const esc = (v: any) => v == null ? '' : String(v).replace(/"/g, '""');
+    const lines = [headers.join(',')];
+    for (const c of carreras) {
+      const escuelaNombre = this.getEscuelaNombre(c.escuelaId);
+      const row = [
+        `"${esc(c.name)}"`,
+        `"${esc(c.code)}"`,
+        `"${esc(escuelaNombre)}"`,
+        `"${esc(c.studentsCount ?? 0)}"`,
+        `"${esc(c.expectedPopulation ?? 0)}"`
+      ];
+      lines.push(row.join(','));
+    }
+    try {
+      const csv = lines.join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'carreras.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      this.message = 'Exportación de carreras completada.';
+    } catch (err) {
+      console.error('Error exportando carreras', err);
+      this.message = 'Error al exportar carreras.';
+    }
+  }
+
+  // Export carreras for a single escuela
+  exportCarrerasCsvForEscuela(escuelaId: string) {
+    if (!escuelaId) { this.message = 'Escuela inválida.'; return; }
+    const carreras = (this.data.getCarreras() || []).filter(c => c.escuelaId === escuelaId);
+    if (!Array.isArray(carreras) || carreras.length === 0) {
+      this.message = 'No hay carreras para exportar en esta escuela.';
+      return;
+    }
+    const headers = ['name','code','studentsCount','expectedPopulation'];
+    const esc = (v: any) => v == null ? '' : String(v).replace(/"/g, '""');
+    const lines = [headers.join(',')];
+    for (const c of carreras) {
+      const row = [
+        `"${esc(c.name)}"`,
+        `"${esc(c.code)}"`,
+        `"${esc(c.studentsCount ?? 0)}"`,
+        `"${esc(c.expectedPopulation ?? 0)}"`
+      ];
+      lines.push(row.join(','));
+    }
+    try {
+      const csv = lines.join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = (this.getEscuelaNombre(escuelaId) || 'escuela').replace(/[^a-z0-9_-]/gi, '_');
+      a.download = `carreras_${safeName}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.message = 'Exportación de carreras completada.';
+    } catch (err) {
+      console.error('Error exportando carreras por escuela', err);
+      this.message = 'Error al exportar carreras.';
+    }
+  }
+
   // Export a single escuela and its carreras as CSV (one row)
   exportEscuelaWithCarrerasCsv(id: string) {
     const e = this.data.getEscuelas().find(x => x.id === id);

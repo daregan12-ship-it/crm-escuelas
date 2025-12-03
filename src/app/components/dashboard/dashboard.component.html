@@ -52,10 +52,15 @@
         <button *ngIf="isAdmin" (click)="open('escuela')">Registrar escuela</button>
         <button *ngIf="isAdmin || currentUserEscuelaId" (click)="open('carrera')">Registrar carrera</button>
         <hr />
-        <button class="mini" (click)="exportEscuelasWithCarrerasCsv()">Exportar escuelas (CSV)</button>
-        <button class="mini" (click)="exportInstitucionesCsv()">Exportar instituciones (CSV)</button>
+        <!-- Admin: global exports -->
+        <button *ngIf="isAdmin" class="mini" (click)="exportEscuelasWithCarrerasCsv()">Exportar escuelas + carreras (global)</button>
+        <button *ngIf="isAdmin" class="mini" (click)="exportCarrerasCsvGlobal()">Exportar carreras (global)</button>
+        <button *ngIf="isAdmin" class="mini" (click)="exportInstitucionesCsv()">Exportar instituciones (global)</button>
         <button *ngIf="isAdmin" class="mini" (click)="exportTemplateEscuelasExcel()">Descargar plantilla (Escuelas)</button>
         <button *ngIf="isAdmin" class="mini" (click)="exportTemplateCarrerasExcel()">Descargar plantilla (Carreras)</button>
+        <!-- Non-admin: only export their escuela/carreras -->
+        <button *ngIf="!isAdmin && currentUserEscuelaId" class="mini" (click)="exportEscuelaWithCarrerasCsv(currentUserEscuelaId)">Exportar mi escuela + carreras (CSV)</button>
+        <button *ngIf="!isAdmin && currentUserEscuelaId" class="mini" (click)="exportCarrerasCsvForEscuela(currentUserEscuelaId)">Exportar carreras (mi escuela)</button>
         <hr />
       </div>
       <div class="menu-box" *ngIf="!menuOpen">
