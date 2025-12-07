@@ -43,6 +43,10 @@ export class DataService {
   private carKey = 'crm_carreras_v1';
   private usersKey = 'crm_users_v1';
 
+  // URL DE TU SERVIDOR EN CODESPACES (Actualizada)
+  // Nota: Si cambias de codespace, tendrás que actualizar esta URL de nuevo.
+  private saveServerUrl = 'https://supreme-space-waddle-q7gjgj9wvwvvfx7jw-3001.app.github.dev/save-json';
+
   // simple in-memory counter to help generate unique ids
   private idCounter = 0;
 
@@ -63,13 +67,20 @@ export class DataService {
       try {
         // don't block main flow if server is not available
         const payload = this.exportAllWithoutLogos();
+        
         // send but don't await
         if (typeof window !== 'undefined' && 'fetch' in window) {
-          fetch('http://localhost:3001/save-json', {
+          // AQUI ESTABA EL CAMBIO: Usamos la URL pública de Codespaces en lugar de localhost
+          fetch(this.saveServerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
-          }).catch(() => { /* ignore errors */ });
+          }).then(res => {
+             if(res.ok) console.log('Datos guardados en JSON remoto correctamente');
+             else console.warn('El servidor remoto respondió error al guardar');
+          }).catch((err) => { 
+             console.warn('No se pudo conectar con el servidor de guardado (¿Está encendido el puerto 3001?)', err);
+          });
         }
       } catch (e) {
         // ignore

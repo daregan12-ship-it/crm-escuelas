@@ -19,6 +19,7 @@ import { ConfirmModalService } from '../../services/confirm-modal.service';
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   userName: string | null = null;
+  userRole: string | null = null;
   isAdmin = false;
   currentUserEscuelaId: string | null = null;
   // when admin clicks a school, show only its carreras in card view
@@ -89,6 +90,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.userName = this.auth.currentUserName();
     const cu = this.auth.currentUser();
+    this.userRole = cu?.role || 'user';
     this.isAdmin = !!(cu && cu.role === 'admin');
     this.currentUserEscuelaId = cu && cu.escuelaId ? cu.escuelaId : null;
     this.escuelas = this.data.getEscuelas();
@@ -332,6 +334,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   // file import handlers
   onEscuelasFileChange(evt: Event) {
+    // only admins can import escuelas
+    if (!this.isAdmin) {
+      this.message = 'Acceso denegado: solo administradores pueden importar escuelas.';
+      return;
+    }
     const input = evt.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
@@ -347,6 +354,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   onDropFiles(event: DragEvent, type: 'escuela' | 'carrera') {
     event.preventDefault();
+    // prevent non-admins from dropping files for escuelas
+    if (type === 'escuela' && !this.isAdmin) {
+      this.message = 'Acceso denegado: solo administradores pueden importar escuelas.';
+      return;
+    }
     const dt = event.dataTransfer;
     if (!dt || !dt.files || dt.files.length === 0) return;
     const file = dt.files[0];
@@ -446,6 +458,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         expectedPopulation: Number(map['poblacion_esperada'] || map['poblacionesperada'] || map['expected_population'] || map['expectedpopulation'] || map['poblacion'] || map['expected'] || 0) || 0,
         logo: ''
       };
+      // If a school is currently viewing (selected), force carreras to that school
+      if (this.viewingEscuelaId) {
+        payload.escuelaId = this.viewingEscuelaId;
+      }
+      // If the current user is not admin, force the carrera to belong to their escuela
+      else if (!this.isAdmin && this.currentUserEscuelaId) {
+        payload.escuelaId = this.currentUserEscuelaId;
+      }
       if (payload.name) {
         this.data.addCarrera(payload);
         added++;
@@ -482,7 +502,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     // if opening the carrera creation form and the user is not admin,
     // force the escuelaId to the user's assigned escuela and mark restriction
     if (side === 'carrera') {
-      if (!this.isAdmin && this.currentUserEscuelaId) {
+      // if a school is currently viewing/selected, use it
+      if (this.viewingEscuelaId) {
+        this.carreraForm.patchValue({ escuelaId: this.viewingEscuelaId });
+        this.restrictCarreraToUserEscuela = true;
+      } else if (!this.isAdmin && this.currentUserEscuelaId) {
         this.carreraForm.patchValue({ escuelaId: this.currentUserEscuelaId });
         this.restrictCarreraToUserEscuela = true;
       } else {
@@ -869,9 +893,13 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   saveCarrera() {
     if (this.carreraForm.invalid) return;
     const payload = { ...(this.carreraForm.value as any) };
-    // if the creation is restricted, enforce the escuelaId to the current user's escuela
-    if (this.restrictCarreraToUserEscuela && this.currentUserEscuelaId) {
-      payload.escuelaId = this.currentUserEscuelaId;
+    // if the creation is restricted, enforce the escuelaId to the currently viewing escuela or user's escuela
+    if (this.restrictCarreraToUserEscuela) {
+      if (this.viewingEscuelaId) {
+        payload.escuelaId = this.viewingEscuelaId;
+      } else if (this.currentUserEscuelaId) {
+        payload.escuelaId = this.currentUserEscuelaId;
+      }
     }
     // ensure numeric
     if (payload.studentsCount !== undefined) payload.studentsCount = Number(payload.studentsCount) || 0;

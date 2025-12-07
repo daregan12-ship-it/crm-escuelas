@@ -3,12 +3,15 @@
     <div class="container">
       <h3>CRM Escuelas</h3>
       <div style="display:flex;align-items:center;gap:12px;position:relative">
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px">
           <div class="small-avatar" style="width:32px;height:32px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f1f5f9;border:1px solid #e6e9ef;color:#0f172a;font-weight:700">
             <img *ngIf="profilePhotoPreview" [src]="profilePhotoPreview" alt="avatar" style="width:100%;height:100%;object-fit:cover" />
             <span *ngIf="!profilePhotoPreview">{{ userName?.charAt(0) || '?' }}</span>
           </div>
-          <div class="user">Hola, <strong>{{ userName }}</strong></div>
+          <div class="user" style="display:flex;flex-direction:column;gap:2px">
+            <div>Hola, <strong>{{ userName }}</strong> <span [style]="userRole === 'admin' ? 'background:linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);color:#fef08a;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-left:8px' : 'background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;text-transform:uppercase'">{{ userRole === 'admin' ? '⚡ Admin' : 'Usuario' }}</span></div>
+            <div style="font-size:12px;color:#64748b">{{ getCurrentUserEmail() }}</div>
+          </div>
         </div>
         <div class="profile-dropdown" style="position:relative">
           <button class="mini" (click)="$event.stopPropagation(); showProfileDropdown = !showProfileDropdown">Mi cuenta ▾</button>
@@ -69,14 +72,15 @@
     </aside>
 
     <section class="content">
-      <p>Desde aquí puedes registrar escuelas y carreras usando el menú.</p>
+      <p *ngIf="isAdmin">Desde aquí puedes registrar escuelas y carreras usando el menú.</p>
+      <p *ngIf="!isAdmin">Desde aqui puedes registrar carreras con el menu de la derecha</p>
 
       <div *ngIf="message" class="message">{{ message }}</div>
 
       <div class="filters-bar">
         <input class="search" placeholder="Buscar escuelas y carreras..." [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilters()" />
 
-        <label class="inline-filter">
+        <label *ngIf="isAdmin" class="inline-filter">
           <input type="checkbox" [checked]="showOnlyWithCarreras" (change)="showOnlyWithCarreras = $any($event.target).checked; applyFilters()" />
           Sólo escuelas con carreras
         </label>
@@ -89,7 +93,7 @@
         </label>
         <label *ngIf="!isAdmin" class="inline-filter">Mostrando carreras de: <strong>{{ getEscuelaNombre(currentUserEscuelaId || '') }}</strong></label>
 
-        <button class="mini" (click)="searchTerm=''; carFilterEscuelaId=''; showOnlyWithCarreras=false; applyFilters()">Limpiar</button>
+        <button *ngIf="isAdmin" class="mini" (click)="searchTerm=''; carFilterEscuelaId=''; showOnlyWithCarreras=false; applyFilters()">Limpiar</button>
       </div>
 
       <div class="lists">
@@ -129,7 +133,7 @@
             <button class="mini" style="margin-left:8px" (click)="openPopulationModal()">Ver gráfico</button>
             <button *ngIf="viewingEscuelaId" class="mini" style="margin-left:8px" (click)="clearViewingEscuela()">Volver</button>
           </h5>
-          <div *ngIf="isAdmin" class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('carrera')" (dragleave)="onImportDragLeave('carrera')" (drop)="onDropFiles($event,'carrera'); onImportDragLeave('carrera')" [class.dragover]="draggingCarrera">
+          <div *ngIf="isAdmin || currentUserEscuelaId" class="import-area" (dragover)="$event.preventDefault()" (dragenter)="onImportDragEnter('carrera')" (dragleave)="onImportDragLeave('carrera')" (drop)="onDropFiles($event,'carrera'); onImportDragLeave('carrera')" [class.dragover]="draggingCarrera">
             <input type="file" accept=".xlsx,.xls,.csv" #carFile hidden (change)="onCarrerasFileChange($event)" />
             <button class="mini" (click)="carFile.click()">Importar Excel (Carreras)</button>
             <small class="muted">o arrastra un archivo aquí</small>
@@ -257,6 +261,14 @@
         <div class="modal-body">
           <div class="form-box">
             <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+              <div [style]="userRole === 'admin' ? 'padding:16px;background:linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);border-radius:8px;margin-bottom:16px;border-left:4px solid #fbbf24;box-shadow:0 4px 15px rgba(30, 64, 175, 0.3)' : 'padding:12px;background:#f1f5f9;border-radius:6px;margin-bottom:12px'">
+                <div [style]="userRole === 'admin' ? 'font-size:11px;color:#93c5fd;text-transform:uppercase;letter-spacing:1px;font-weight:700' : 'font-size:12px;color:#64748b;text-transform:uppercase'">
+                  <span *ngIf="userRole === 'admin'">⚡ </span>Rol
+                </div>
+                <div [style]="userRole === 'admin' ? 'font-weight:700;color:#fef08a;font-size:18px;margin-top:6px;text-shadow:0 2px 4px rgba(0,0,0,0.3)' : 'font-weight:600;color:#0f172a'">
+                  {{ userRole === 'admin' ? 'ADMINISTRADOR' : 'Usuario' }}
+                </div>
+              </div>
               <label>Nombre
                 <input formControlName="name" placeholder="Tu nombre" /></label>
               <label>Email

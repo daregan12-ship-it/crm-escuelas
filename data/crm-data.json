@@ -1,9 +1,22 @@
 {
-  "savedAt": "2025-12-03T21:53:25.435Z",
+  "savedAt": "2025-12-04T16:28:12.826Z",
   "payload": {
     "escuelas": [
       {
-        "id": "esc_1764709406734_2_i0htuijjc",
+        "id": "esc_1763535515364_10_zhm12acxb",
+        "nombre": "Instituto Tecnologico de Aguascalientes",
+        "cct": "01DIT0015C",
+        "telefono": " +52 (449) 910 50 02",
+        "extension": "",
+        "correo": "ita@aguascalientes.com",
+        "representanteNombre": "Dr. José Luis Gil Vázquez",
+        "representantePuesto": "Director general",
+        "direccion": "Av. Adolfo López Mateos #1801 Ote. Fracc. Bona Gens, C.P. 20255 Aguascalientes, Ags., México.",
+        "pagina": "comunicacion@aguascalientes.tecnm.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1763535515365_11_uv5vb3znv",
         "nombre": "Tecnológico Nacional de México Campus Monterrey",
         "cct": "19DIT0001A",
         "telefono": 8183749200,
@@ -16,7 +29,7 @@
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
       },
       {
-        "id": "esc_1764709406735_3_mm62xnsea",
+        "id": "esc_1763535515365_12_4xjvxpy7u",
         "nombre": "Instituto Tecnológico de Pachuca",
         "cct": "13DIT0020T",
         "telefono": "771 711 3073 / 771 711 3596 / 771 711 3140 / 771 711 5119",
@@ -27,78 +40,193 @@
         "direccion": "Carretera México-Pachuca Km. 87.5, Col. Venta Prieta, Pachuca de Soto, Hidalgo",
         "pagina": "https://www.itpachuca.edu.mx",
         "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1763535515366_13_9uqzanudf",
+        "nombre": "Instituto Tecnológico de Estudios Superiores de Zamora",
+        "cct": "30EIT0007O",
+        "telefono": "351-520-0177",
+        "extension": 1101,
+        "correo": "direcciongeneral@teczamora.mx",
+        "representanteNombre": "Mtro. Karlo Martín Samaguey Zamora",
+        "representantePuesto": "Director General",
+        "direccion": "Carretera Zamora-La Piedad Km 7, El Sáuz de Abajo, Zamora, Michoacán C.P. 59720",
+        "pagina": "https://www.teczamora.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1763535515367_14_21r0vy7lu",
+        "nombre": "Instituto Tecnológico Superior de Xalapa",
+        "cct": "30EIT0007O",
+        "telefono": "(228) 165-05-25",
+        "extension": 101,
+        "correo": "direcciongeneral@itsx.edu.mx",
+        "representanteNombre": "Omar Romero Sandoval",
+        "representantePuesto": "Director General",
+        "direccion": "Sección 5ta Reserva Territorial s/n, Col. Santa Bárbara, C.P. 91096, Xalapa, Veracruz",
+        "pagina": "comunicacion@aguascalientes.tecnm.mx",
+        "encargadoRegistro": "Andres Aurelio Palmerin Torres"
+      },
+      {
+        "id": "esc_1764864583312_1_bkr7nun6s",
+        "nombre": "Instituto Tecnologico de Aguascalientes",
+        "cct": "01DIT0015C",
+        "telefono": " +52 (449) 910 50 02",
+        "extension": "",
+        "correo": "ita@aguascalientes.com",
+        "representanteNombre": "Dr. José Luis Gil Vázquez",
+        "representantePuesto": "Director general",
+        "direccion": "Av. Adolfo López Mateos #1801 Ote. Fracc. Bona Gens, C.P. 20255 Aguascalientes, Ags., México.",
+        "pagina": "comunicacion@aguascalientes.tecnm.mx",
+        "encargadoRegistro": "Administrador por defecto"
+      },
+      {
+        "id": "esc_1764864583315_2_30msw0775",
+        "nombre": "Tecnológico Nacional de México Campus Monterrey",
+        "cct": "19DIT0001A",
+        "telefono": 8183749200,
+        "extension": 102,
+        "correo": "jose.martinez@monterrey.tecnm.mx",
+        "representanteNombre": "José Martínez López",
+        "representantePuesto": "Director General",
+        "direccion": "Av. Eugenio Garza Sada 2501, Monterrey, N.L.",
+        "pagina": "www.mty.tecnm.mx",
+        "encargadoRegistro": "Administrador por defecto"
+      },
+      {
+        "id": "esc_1764864583318_3_3k7zarl98",
+        "nombre": "Instituto Tecnológico de Pachuca",
+        "cct": "13DIT0020T",
+        "telefono": "771 711 3073 / 771 711 3596 / 771 711 3140 / 771 711 5119",
+        "extension": 1002,
+        "correo": "dir_pachuca@tecnm.mx",
+        "representanteNombre": "Mtro. Miguel Ángel Lee Rodríguez",
+        "representantePuesto": "Director",
+        "direccion": "Carretera México-Pachuca Km. 87.5, Col. Venta Prieta, Pachuca de Soto, Hidalgo",
+        "pagina": "https://www.itpachuca.edu.mx",
+        "encargadoRegistro": "Administrador por defecto"
+      },
+      {
+        "id": "esc_1764864583323_4_rtfc657mq",
+        "nombre": "Instituto Tecnológico de Estudios Superiores de Zamora",
+        "cct": "30EIT0007O",
+        "telefono": "351-520-0177",
+        "extension": 1101,
+        "correo": "direcciongeneral@teczamora.mx",
+        "representanteNombre": "Mtro. Karlo Martín Samaguey Zamora",
+        "representantePuesto": "Director General",
+        "direccion": "Carretera Zamora-La Piedad Km 7, El Sáuz de Abajo, Zamora, Michoacán C.P. 59720",
+        "pagina": "https://www.teczamora.mx",
+        "encargadoRegistro": "Administrador por defecto"
+      },
+      {
+        "id": "esc_1764864583327_5_tak8w6eja",
+        "nombre": "Instituto Tecnológico Superior de Xalapa",
+        "cct": "30EIT0007O",
+        "telefono": "(228) 165-05-25",
+        "extension": 101,
+        "correo": "direcciongeneral@itsx.edu.mx",
+        "representanteNombre": "Omar Romero Sandoval",
+        "representantePuesto": "Director General",
+        "direccion": "Sección 5ta Reserva Territorial s/n, Col. Santa Bárbara, C.P. 91096, Xalapa, Veracruz",
+        "pagina": "comunicacion@aguascalientes.tecnm.mx",
+        "encargadoRegistro": "Administrador por defecto"
       }
     ],
     "carreras": [
       {
-        "id": "car_1764798756272_1_s41bhfqkz",
+        "id": "car_1763535549195_1_l4rc77kbi",
         "name": "Ingeniería en Administración",
         "code": "IA",
-        "escuelaId": "esc_1764709406734_2_i0htuijjc",
+        "escuelaId": "esc_1763535515364_10_zhm12acxb",
         "studentsCount": 50,
-        "expectedPopulation": 220
+        "expectedPopulation": 90
       },
       {
-        "id": "car_1764798756273_2_7ibr2eh7u",
+        "id": "car_1763535549195_2_qqph3ijrj",
         "name": "Ingeniería en Gestión Empresarial",
         "code": "IGE",
-        "escuelaId": "esc_1764709406734_2_i0htuijjc",
+        "escuelaId": "esc_1763535515365_11_uv5vb3znv",
         "studentsCount": 125,
-        "expectedPopulation": 130
+        "expectedPopulation": 100
       },
       {
-        "id": "car_1764798756273_3_xq1jf91ge",
+        "id": "car_1763535549196_3_8wof5uznp",
         "name": "Ingeniería en Sistemas Computacionales",
         "code": "ISC",
-        "escuelaId": "esc_1764709406734_2_i0htuijjc",
+        "escuelaId": "esc_1763535515365_12_4xjvxpy7u",
         "studentsCount": 200,
-        "expectedPopulation": 250
+        "expectedPopulation": 120
       },
       {
-        "id": "car_1764798756273_4_tabdby6dr",
+        "id": "car_1763535549196_4_z7iigharo",
         "name": "Ingeniería en Tecnologías de la Información y Comunicaciones",
         "code": "ITIC",
-        "escuelaId": "",
+        "escuelaId": "esc_1763535515365_11_uv5vb3znv",
         "studentsCount": 100,
+        "expectedPopulation": 500
+      },
+      {
+        "id": "car_1763566749759_1_04ghwcazm",
+        "name": "Ingenieria en Analisis de Datos",
+        "code": "0A1A55A48",
+        "escuelaId": "esc_1763535515364_10_zhm12acxb",
+        "studentsCount": 151,
+        "expectedPopulation": 200
+      },
+      {
+        "id": "car_1764864625016_6_g28bz5elu",
+        "name": "Ingeniería en Administración",
+        "code": "",
+        "escuelaId": "",
+        "studentsCount": 0,
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764798756274_5_4cmtdrchz",
-        "name": "Ingeniería Bioquímica",
-        "code": "IBQ",
+        "id": "car_1764864625017_7_lwlyc0w6n",
+        "name": "Ingeniería en Gestión Empresarial",
+        "code": "",
         "escuelaId": "",
-        "studentsCount": 123,
+        "studentsCount": 0,
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764798756274_6_sf5szjswb",
-        "name": "Ingeniería Industrial",
-        "code": "II",
+        "id": "car_1764864625019_8_gnvr6tdvy",
+        "name": "Ingeniería en Sistemas Computacionales",
+        "code": "",
         "escuelaId": "",
-        "studentsCount": 330,
+        "studentsCount": 0,
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764798756275_7_w7r4om9fo",
-        "name": "Ingeniería Mecatrónica",
-        "code": "IM",
+        "id": "car_1764864625021_9_74qqgn3ne",
+        "name": "Ingeniería en Tecnologías de la Información y Comunicaciones",
+        "code": "",
         "escuelaId": "",
-        "studentsCount": 152,
+        "studentsCount": 0,
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764798756275_8_8ngyp895l",
-        "name": "Ingeniería en Inteligencia Artificial",
-        "code": "IIA",
+        "id": "car_1764864625022_10_wb868x6ew",
+        "name": "Ingenieria en Analisis de Datos",
+        "code": "",
         "escuelaId": "",
-        "studentsCount": 5,
+        "studentsCount": 0,
         "expectedPopulation": 0
       },
       {
-        "id": "car_1764798756275_9_066ste8ga",
-        "name": "Contador Público",
-        "code": "CP",
-        "escuelaId": "",
+        "id": "car_1764865316562_1_j7ope6m49",
+        "name": "Ingeniería en Administración",
+        "code": "",
+        "escuelaId": "esc_1764864583327_5_tak8w6eja",
+        "studentsCount": 0,
+        "expectedPopulation": 0
+      },
+      {
+        "id": "car_1764865692440_1_s4qv63cc4",
+        "name": "Ingeniería en Administración",
+        "code": "",
+        "escuelaId": "esc_1763535515366_13_9uqzanudf",
         "studentsCount": 0,
         "expectedPopulation": 0
       }
@@ -109,24 +237,31 @@
         "email": "teamcap121@hotmail.com"
       },
       {
-        "name": "Sara Dayana Sanchez Torres",
-        "email": "sara@gmail.com"
-      },
-      {
-        "name": "Administrador por defecto",
+        "name": "Aurelio Palmerin",
         "email": "admin@crm.local",
         "role": "admin"
       },
       {
-        "name": "Andrés Aurelio Palmerin Torres",
-        "email": "daregan12@gmail.com",
+        "name": "Diana Laura Ayala Maya",
+        "email": "diana@gmail.com",
+        "role": "user",
+        "escuelaId": "esc_1763535515364_10_zhm12acxb"
+      },
+      {
+        "name": "Sara Admin",
+        "email": "sara1@gmail.com",
         "role": "admin"
       },
       {
-        "name": "Sara Torres",
-        "email": "123@gmail.com",
+        "name": "Juana Meza",
+        "email": "juanaadmin1@gmail.com",
+        "role": "admin"
+      },
+      {
+        "name": "Abel T",
+        "email": "theweeknd@gmail.com",
         "role": "user",
-        "escuelaId": "esc_1764709406734_1_2vrm77898"
+        "escuelaId": "esc_1763535515364_10_zhm12acxb"
       }
     ]
   }
